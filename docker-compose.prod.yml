@@ -1,0 +1,26 @@
+services:
+  vr-web:
+    build: .
+    restart: always
+    networks:
+      - proxy
+    deploy:
+      resources:
+        limits:
+          memory: 64M
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.vr.rule=Host(`vr.ostrov-vezeniya.ru`)"
+      - "traefik.http.routers.vr.entrypoints=websecure"
+      - "traefik.http.routers.vr.tls.certresolver=letsencrypt"
+      - "traefik.http.services.vr.loadbalancer.server.port=80"
+      # Также доступен по IP/vr/
+      - "traefik.http.routers.vr-path.rule=PathPrefix(`/vr`)"
+      - "traefik.http.routers.vr-path.entrypoints=websecure"
+      - "traefik.http.routers.vr-path.priority=20"
+      - "traefik.http.routers.vr-path.middlewares=vr-stripprefix"
+      - "traefik.http.middlewares.vr-stripprefix.stripprefix.prefixes=/vr"
+
+networks:
+  proxy:
+    external: true
