@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Стоимость VR-контента — VR-экосистема СПб</title>
+<script src="https://cdn.jsdelivr.net/npm/echarts@5.5.1/dist/echarts.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#0f0f23;--card:#1a1a2e;--text:#e0e0e0;--text2:#8888aa;--accent:#6366f1;--green:#22c55e;--amber:#f59e0b;--cyan:#06b6d4;--pink:#ec4899;--radius:12px}
+body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,-apple-system,sans-serif}
+nav{padding:15px 40px;border-bottom:1px solid #222}nav a{color:var(--accent);text-decoration:none;font-size:.85rem}
+header{padding:30px 40px 10px}header h1{font-size:1.6rem}header p{color:var(--text2);margin-top:6px;font-size:.9rem}
+main{padding:10px 40px 60px;display:grid;gap:24px;grid-template-columns:1fr 1fr}
+.chart-card{background:var(--card);border-radius:var(--radius);padding:24px;border:1px solid #222}
+.chart-card.full{grid-column:1/-1}
+.chart-card h2{font-size:1.1rem;margin-bottom:4px}.chart-card .subtitle{color:var(--text2);font-size:.8rem;margin-bottom:16px}
+.chart-box{width:100%;height:450px}
+.source{color:var(--text2);font-size:.75rem;margin-top:12px;font-style:italic}
+footer{text-align:center;padding:20px;color:var(--text2);font-size:.8rem;border-top:1px solid #222}
+@media(max-width:900px){main{grid-template-columns:1fr;padding:10px 15px}}
+</style>
+</head>
+<body>
+<nav><a href="index.html">← Все визуализации</a></nav>
+<header><h1>Стоимость VR-контента</h1><p>8 типов: от 50K до 5M руб. Время, команда, оборудование.</p></header>
+<main>
+  <div class="chart-card full">
+    <h2>Стоимость по типам контента (диапазон)</h2>
+    <div class="subtitle">Минимум и максимум стоимости для каждого типа</div>
+    <div id="cost_range" class="chart-box"></div>
+    <p class="source">Источник: Глава 11, табл. 11.3</p>
+  </div>
+  <div class="chart-card">
+    <h2>Стоимость vs Время создания</h2>
+    <div class="subtitle">Размер = численность команды (FTE)</div>
+    <div id="bubble" class="chart-box"></div>
+    <p class="source">Источник: Глава 11, табл. 11.3</p>
+  </div>
+  <div class="chart-card">
+    <h2>Рекомендуемый контент-микс</h2>
+    <div id="mix" class="chart-box"></div>
+    <p class="source">Источник: Глава 11, раздел 11.3</p>
+  </div>
+</main>
+<footer>VR-экосистема СПб &bull; Глава 11. Стоимость контента &bull; 2026</footer>
+<script>
+const C={accent:'#6366f1',green:'#22c55e',amber:'#f59e0b',cyan:'#06b6d4',pink:'#ec4899'};
+const types=['360° простое','360° режиссёрское','Gaussian Splatting\n(объект)','GS (здание)','AI-реконструкция','Интерактивный VR','Volumetric capture','VR-фильм'];
+const mins=[50,200,50,200,100,500,500,2000];
+const maxs=[150,500,300,500,500,1500,2000,5000];
+
+// Range bar
+const c1=echarts.init(document.getElementById('cost_range'),'dark');
+c1.setOption({
+  backgroundColor:'#1a1a2e',
+  tooltip:{trigger:'axis',axisPointer:{type:'shadow'},formatter:function(p){return p[0].axisValue+'<br>'+p[0].marker+'Мин: '+p[0].value+'K ₽<br>'+p[1].marker+'Макс: '+p[1].value+'K ₽'}},
+  toolbox:{right:10,feature:{saveAsImage:{title:'PNG'}}},
+  grid:{left:160,right:40,bottom:30,top:20},
+  xAxis:{type:'value',name:'тыс. ₽',axisLabel:{color:'#aaa'},splitLine:{lineStyle:{color:'#333'}}},
+  yAxis:{type:'category',data:types,axisLabel:{color:'#ccc',fontSize:11}},
+  series:[
+    {name:'Минимум',type:'bar',data:mins,itemStyle:{color:C.green},barGap:'-100%',z:2},
+    {name:'Максимум',type:'bar',data:maxs,itemStyle:{color:'rgba(99,102,241,0.4)'},z:1}
+  ]
+});
+
+// Bubble: cost vs time
+const c2=echarts.init(document.getElementById('bubble'),'dark');
+const items=[
+  {name:'360° простое',cost:100,days:2,fte:1.5},
+  {name:'360° режиссёрское',cost:350,days:14,fte:4},
+  {name:'GS объект',cost:175,days:5,fte:1.5},
+  {name:'GS здание',cost:350,days:14,fte:2.5},
+  {name:'AI-реконструкция',cost:300,days:28,fte:3},
+  {name:'Интерактивный VR',cost:1000,days:60,fte:4.5},
+  {name:'Volumetric capture',cost:1250,days:10,fte:6},
+  {name:'VR-фильм',cost:3500,days:135,fte:11.5}
+];
+c2.setOption({
+  backgroundColor:'#1a1a2e',
+  tooltip:{formatter:function(p){const d=items[p.dataIndex];return '<b>'+d.name+'</b><br>Стоимость: ~'+d.cost+'K ₽<br>Срок: ~'+d.days+' дней<br>Команда: ~'+d.fte+' FTE'}},
+  toolbox:{right:10,feature:{saveAsImage:{title:'PNG'}}},
+  grid:{left:60,right:30,bottom:50,top:20},
+  xAxis:{type:'value',name:'Срок (дней)',nameLocation:'center',nameGap:30,axisLabel:{color:'#aaa'},splitLine:{lineStyle:{color:'#333'}}},
+  yAxis:{type:'value',name:'Стоимость (тыс. ₽)',nameLocation:'center',nameGap:45,axisLabel:{color:'#aaa'},splitLine:{lineStyle:{color:'#333'}}},
+  series:[{type:'scatter',
+    data:items.map(d=>[d.days,d.cost]),
+    symbolSize:function(d,p){return items[p.dataIndex].fte*8},
+    itemStyle:{color:C.accent,borderColor:'#fff',borderWidth:1,opacity:.8},
+    label:{show:true,position:'right',formatter:function(p){return items[p.dataIndex].name},color:'#ccc',fontSize:10}
+  }]
+});
+
+// Content mix pie
+const c3=echarts.init(document.getElementById('mix'),'dark');
+c3.setOption({
+  backgroundColor:'#1a1a2e',
+  tooltip:{trigger:'item',formatter:'{b}: {d}%'},
+  series:[{type:'pie',radius:['35%','65%'],center:['50%','55%'],label:{color:'#ccc',fontSize:11},
+    data:[
+      {value:50,name:'360° режиссёрское (50%)',itemStyle:{color:C.accent}},
+      {value:30,name:'Gaussian Splatting (30%)',itemStyle:{color:C.green}},
+      {value:20,name:'Интерактивный VR (20%)',itemStyle:{color:C.amber}}
+    ]}]
+});
+
+window.addEventListener('resize',()=>{[c1,c2,c3].forEach(c=>c.resize())});
+</script>
+</body>
+</html>

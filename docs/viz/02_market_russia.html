@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Российский рынок VR/AR — VR-экосистема СПб</title>
+<script src="https://cdn.jsdelivr.net/npm/echarts@5.5.1/dist/echarts.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#0f0f23;--card:#1a1a2e;--card2:#16162c;--text:#e0e0e0;--text2:#8888aa;--accent:#6366f1;--green:#22c55e;--amber:#f59e0b;--red:#ef4444;--cyan:#06b6d4;--pink:#ec4899;--purple:#8b5cf6;--radius:12px;--orange:#f97316}
+body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,-apple-system,sans-serif;line-height:1.6}
+nav{padding:15px 40px;border-bottom:1px solid #222}nav a{color:var(--accent);text-decoration:none;font-size:.85rem}
+header{padding:30px 40px 10px;max-width:1400px;margin:auto}
+header h1{font-size:1.6rem;font-weight:700;background:linear-gradient(135deg,var(--accent),var(--cyan));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+header p{color:var(--text2);margin-top:6px;font-size:.9rem}
+main{padding:10px 40px 60px;max-width:1400px;margin:auto;display:grid;gap:24px}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+.chart-card{background:var(--card);border-radius:var(--radius);padding:24px;border:1px solid #222}
+.chart-card h2{font-size:1.1rem;margin-bottom:4px}
+.chart-card .sub{color:var(--text2);font-size:.8rem;margin-bottom:16px}
+.chart-box{width:100%;height:420px}
+.chart-box.tall{height:500px}
+.source{color:var(--text2);font-size:.72rem;margin-top:10px;font-style:italic}
+
+/* Key facts */
+.facts{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin-bottom:8px}
+.fact{background:var(--card2);border-radius:10px;padding:16px;text-align:center;border:1px solid #222}
+.fact .val{font-size:1.7rem;font-weight:700}
+.fact .label{font-size:.73rem;color:var(--text2);margin-top:4px}
+.c-accent{color:var(--accent)}.c-green{color:var(--green)}.c-amber{color:var(--amber)}.c-cyan{color:var(--cyan)}.c-pink{color:var(--pink)}.c-red{color:var(--red)}.c-orange{color:var(--orange)}
+
+/* Callout banner */
+.callout{background:linear-gradient(135deg,rgba(99,102,241,.08),rgba(6,182,212,.06));border:1px solid rgba(99,102,241,.25);border-radius:10px;padding:18px 22px;margin-bottom:8px;font-size:.88rem;line-height:1.65}
+.callout strong{color:var(--accent)}
+
+/* Resources */
+.resources{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px;margin-top:16px}
+.res{display:flex;align-items:flex-start;gap:10px;padding:12px;background:rgba(99,102,241,.04);border:1px solid #333;border-radius:8px;text-decoration:none;color:var(--text);transition:all .15s}
+.res:hover{border-color:var(--accent);background:rgba(99,102,241,.08)}
+.res .ico{font-size:1.4rem;flex-shrink:0;margin-top:2px}
+.res .info{flex:1}
+.res .info .name{font-size:.85rem;font-weight:600}
+.res .info .desc{font-size:.72rem;color:var(--text2);margin-top:2px}
+.res .info .link{font-size:.7rem;color:var(--accent);margin-top:3px;word-break:break-all}
+
+/* Data table */
+.data-table{width:100%;font-size:.8rem;border-collapse:collapse;margin-top:12px}
+.data-table th{text-align:left;color:var(--accent);padding:8px;border-bottom:1px solid #333;font-weight:600}
+.data-table td{padding:8px;border-bottom:1px solid #222;vertical-align:top}
+.data-table tr:hover td{background:rgba(99,102,241,.03)}
+.tag{display:inline-block;padding:2px 8px;border-radius:12px;font-size:.7rem;font-weight:600}
+.tag-max{background:rgba(34,197,94,.15);color:var(--green)}
+.tag-high{background:rgba(99,102,241,.15);color:var(--accent)}
+.tag-mid{background:rgba(245,158,11,.15);color:var(--amber)}
+.tag-low{background:rgba(100,116,139,.15);color:#94a3b8}
+.tag-spb{background:rgba(236,72,153,.15);color:var(--pink)}
+
+/* Pushkin card visual */
+.pushkin-card{display:flex;align-items:center;gap:20px;padding:20px;background:linear-gradient(135deg,rgba(139,92,246,.08),rgba(236,72,153,.06));border:1px solid rgba(139,92,246,.25);border-radius:12px;margin-top:12px}
+.pushkin-card .pc-icon{font-size:2.5rem}
+.pushkin-card .pc-text{flex:1}
+.pushkin-card .pc-text h3{font-size:.95rem;color:var(--purple);margin-bottom:4px}
+.pushkin-card .pc-text p{font-size:.8rem;color:var(--text2);line-height:1.5}
+.pushkin-card .pc-nums{display:flex;gap:16px}
+.pushkin-card .pc-num{text-align:center}
+.pushkin-card .pc-num .pv{font-size:1.3rem;font-weight:700;color:var(--purple)}
+.pushkin-card .pc-num .pl{font-size:.65rem;color:var(--text2)}
+
+footer{text-align:center;padding:20px;color:var(--text2);font-size:.8rem;border-top:1px solid #222;max-width:1400px;margin:auto}
+@media(max-width:900px){.row2{grid-template-columns:1fr}.facts{grid-template-columns:repeat(2,1fr)}main{padding:10px 15px}.chart-box{height:350px}.pushkin-card{flex-direction:column;text-align:center}.pushkin-card .pc-nums{flex-direction:column;gap:8px}}
+@media(max-width:500px){.facts{grid-template-columns:1fr}.fact .val{font-size:1.3rem}}
+</style>
+</head>
+<body>
+<nav><a href="index.html">&larr; Все визуализации</a> &nbsp;|&nbsp; <a href="01_market_global.html">&larr; Глобальный рынок</a></nav>
+<header>
+  <h1>Российский рынок VR/AR 2024-2025</h1>
+  <p>Глава 2 исследования &bull; Объём, сегменты, игроки, государственные программы, оборудование</p>
+</header>
+<main>
+
+<!-- KEY FACTS -->
+<div class="facts">
+  <div class="fact"><div class="val c-accent">&#8381;5 млрд</div><div class="label">Рынок VR/AR в РФ, 2024</div></div>
+  <div class="fact"><div class="val c-green">+43%</div><div class="label">Рост год к году</div></div>
+  <div class="fact"><div class="val c-amber">31%</div><div class="label">CAGR 2024-2030</div></div>
+  <div class="fact"><div class="val c-cyan">0,13%</div><div class="label">Доля от мирового рынка</div></div>
+  <div class="fact"><div class="val c-pink">~15-20</div><div class="label">VR-студий для культуры</div></div>
+</div>
+
+<!-- CALLOUT -->
+<div class="callout">
+  <strong>Ключевой парадокс:</strong> Российский рынок VR составляет менее 0,1% от мирового, но растёт в 1,3-1,7 раза быстрее. Культурный сегмент (~5-7%) &mdash; один из наиболее перспективных: конкуренция минимальна, госфинансирование доступно, русскоязычного VR-контента почти нет.
+</div>
+
+<!-- CHART 1: Russian market timeline -->
+<div class="chart-card">
+  <h2>Динамика российского рынка VR/AR (2019-2030)</h2>
+  <div class="sub">Фактические данные 2019-2025, прогнозы 2026-2030. CAGR ~31% (Аналитический центр при Правительстве РФ). 2025: ₽7 млрд — прогноз ТМТ Консалтинг</div>
+  <div id="ch_timeline" class="chart-box tall"></div>
+  <p class="source">Источники: Аналитический центр при Правительстве РФ, TAdviser, Mordor Intelligence, J'son &amp; Partners (2024)</p>
+</div>
+
+<!-- ROW: Segments + RU vs World -->
+<div class="row2">
+  <div class="chart-card">
+    <h2>Сегментация рынка РФ по отраслям</h2>
+    <div class="sub">2024, оценка. Культурный сегмент &mdash; &#8381;0,25-0,35 млрд</div>
+    <div id="ch_segments" class="chart-box"></div>
+    <p class="source">Источник: ICT.Moscow, Sostav.ru, TAdviser, Росэлторг (2024)</p>
+  </div>
+  <div class="chart-card">
+    <h2>Россия vs Мир: структура рынка</h2>
+    <div class="sub">Сравнение долей сегментов &mdash; перекос в сторону B2B</div>
+    <div id="ch_ruvsworld" class="chart-box"></div>
+    <p class="source">Источник: авторские расчёты на основе TAdviser, Statista, IDC (2024)</p>
+  </div>
+</div>
+
+<!-- CHART: Equipment pricing -->
+<div class="chart-card">
+  <h2>Доступность и цены VR-шлемов в России (2025)</h2>
+  <div class="sub">Сравнение цен: Россия vs мировая цена. Зелёным &mdash; официальные каналы, красным &mdash; серый рынок</div>
+  <div id="ch_prices" class="chart-box tall"></div>
+  <p class="source">Источники: Vizzion.ru, VR Concept, Яндекс.Маркет, Ozon &mdash; мониторинг цен, январь 2025</p>
+</div>
+
+<!-- ROW: Gov funding + Pushkin Card -->
+<div class="row2">
+  <div class="chart-card">
+    <h2>Государственное финансирование VR в культуре</h2>
+    <div class="sub">Основные программы и фонды: размер пузырька = доступный объём</div>
+    <div id="ch_gov" class="chart-box"></div>
+    <p class="source">Источники: ПФКИ, Минцифры, Минкультуры, НП &laquo;Экономика данных&raquo;, &laquo;Сколково&raquo; (2024-2025)</p>
+  </div>
+  <div class="chart-card">
+    <h2>Пушкинская карта: рост программы</h2>
+    <div class="sub">10,5 млн активных карт, 42 млн билетов &mdash; готовый канал для VR</div>
+    <div id="ch_pushkin" class="chart-box"></div>
+    <p class="source">Источник: PRO.Культура.РФ, Минкультуры РФ, Почта Банк (2024)</p>
+  </div>
+</div>
+
+<!-- Pushkin card visual -->
+<div class="chart-card">
+  <div class="pushkin-card">
+    <div class="pc-icon">&#127915;</div>
+    <div class="pc-text">
+      <h3>Пушкинская карта &mdash; потенциальный game-changer для VR</h3>
+      <p>Целевая аудитория (14-22 лет) совпадает с ядром VR-потребителей. При конверсии 1-5% &mdash; от 100 000 до 500 000 VR-сессий в год. Средний чек VR-сеанса (300-500 руб.) комфортно вписывается в номинал карты (5 000 руб.)</p>
+    </div>
+    <div class="pc-nums">
+      <div class="pc-num"><div class="pv">10,5 М</div><div class="pl">активных карт</div></div>
+      <div class="pc-num"><div class="pv">42 М</div><div class="pl">билетов/год</div></div>
+      <div class="pc-num"><div class="pv">&#8381;30 млрд</div><div class="pl">оборот 2024</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- CHART: VR content studios -->
+<div class="chart-card">
+  <h2>Карта VR-студий для культуры</h2>
+  <div class="sub">Релевантность для проекта vs опыт культурного VR. Розовым &mdash; петербургские студии</div>
+  <div id="ch_studios" class="chart-box tall"></div>
+  <p class="source">Источник: открытые данные компаний, профильные конференции, 2024</p>
+</div>
+
+<!-- Studios table -->
+<div class="chart-card">
+  <h2>Российские VR-студии: сравнительная таблица</h2>
+  <div class="sub">Студии, работающие с культурным VR-контентом</div>
+  <table class="data-table">
+    <tr><th>Студия</th><th>Город</th><th>Специализация</th><th>Ключевой проект</th><th>Рекомендация</th></tr>
+    <tr><td>Медиафабрика</td><td><span class="tag tag-spb">СПб</span></td><td>VR-фильмы, художественная VR-фиксация</td><td>&laquo;Эрмитаж VR&raquo;, &laquo;Петергоф VR&raquo;, &laquo;Китайский дворец&raquo;</td><td><span class="tag tag-max">Приоритетный партнёр</span></td></tr>
+    <tr><td>Vinchi Interactive</td><td>Москва</td><td>Музейные VR-туры, мультимедиагиды</td><td>437 мультимедиагидов (ФП &laquo;Цифровая культура&raquo;)</td><td><span class="tag tag-max">Стратегический партнёр</span></td></tr>
+    <tr><td>iVariant</td><td>Москва</td><td>Интерактивный VR для музеев</td><td>VR-тур &laquo;Подводная лодка "Мир"&raquo;</td><td><span class="tag tag-high">Подрядчик</span></td></tr>
+    <tr><td>Immersivity</td><td><span class="tag tag-spb">СПб</span></td><td>Иммерсивные шоу, VR-инсталляции</td><td>Интерактивные выставки</td><td><span class="tag tag-high">Партнёр форматов</span></td></tr>
+    <tr><td>Modum Lab</td><td><span class="tag tag-spb">М / СПб</span></td><td>VR-тренажёры, образовательный VR</td><td>VR для &laquo;Газпром&raquo;, &laquo;Росатом&raquo;, ИТМО</td><td><span class="tag tag-mid">Технологический R&amp;D</span></td></tr>
+    <tr><td>VR Concept</td><td>Москва</td><td>Промышленный VR, дистрибуция Pico</td><td>Промышленные VR-решения</td><td><span class="tag tag-mid">Поставщик оборудования</span></td></tr>
+    <tr><td>Varwin</td><td>Москва</td><td>No-code VR-платформа</td><td>Varwin XRMS</td><td><span class="tag tag-mid">Платформенный партнёр</span></td></tr>
+    <tr><td>SocSight</td><td>Москва</td><td>VR-спектакли, документальный VR</td><td>Документальный VR</td><td><span class="tag tag-mid">Контентный партнёр</span></td></tr>
+    <tr><td>Morfeus</td><td><span class="tag tag-spb">М / СПб</span></td><td>Иммерсивный театр с VR</td><td>Иммерсивные шоу</td><td><span class="tag tag-mid">Консультант</span></td></tr>
+    <tr><td>Fibrum</td><td>Москва</td><td>VR-приложения, платформа дистрибуции</td><td>Fibrum Platform</td><td><span class="tag tag-low">Платформа</span></td></tr>
+  </table>
+</div>
+
+<!-- SPb projects chart -->
+<div class="chart-card">
+  <h2>VR-проекты Санкт-Петербурга: хронология</h2>
+  <div class="sub">Доказательная база &mdash; Петербург уже имеет опыт VR в культуре</div>
+  <div id="ch_spb" class="chart-box"></div>
+  <p class="source">Источники: Медиафабрика, Эрмитаж, ИТМО, Мариинский театр, Библиотека Маяковского (2024-2025)</p>
+</div>
+
+<!-- RESOURCES -->
+<div class="chart-card">
+  <h2>&#128279; Ключевые ресурсы и источники</h2>
+  <div class="resources">
+    <a class="res" href="https://ac.gov.ru/news/page/v-blizajsie-gody-tempy-rosta-vr-rynka-v-rossii-sostavat-31-26855" target="_blank" rel="noopener">
+      <div class="ico">&#127963;</div>
+      <div class="info"><div class="name">Аналитический центр при Правительстве РФ</div><div class="desc">&laquo;Темпы роста VR-рынка в России составят 31%&raquo; &mdash; базовый прогноз</div><div class="link">ac.gov.ru</div></div>
+    </a>
+    <a class="res" href="https://www.tadviser.ru/" target="_blank" rel="noopener">
+      <div class="ico">&#128202;</div>
+      <div class="info"><div class="name">TAdviser &mdash; Рынок VR/AR (Россия)</div><div class="desc">Ведущая российская аналитика по VR/AR, данные и сегментация</div><div class="link">tadviser.ru</div></div>
+    </a>
+    <a class="res" href="https://ict.moscow/projects/vrar/" target="_blank" rel="noopener">
+      <div class="ico">&#128161;</div>
+      <div class="info"><div class="name">ICT.Moscow &mdash; База знаний VR/AR</div><div class="desc">Каталог VR/AR-проектов и компаний в России</div><div class="link">ict.moscow/projects/vrar</div></div>
+    </a>
+    <a class="res" href="https://pro.culture.ru/" target="_blank" rel="noopener">
+      <div class="ico">&#127915;</div>
+      <div class="info"><div class="name">PRO.Культура.РФ &mdash; Пушкинская карта</div><div class="desc">Официальный портал для учреждений культуры, интеграция VR-событий</div><div class="link">pro.culture.ru</div></div>
+    </a>
+    <a class="res" href="https://xn--80afcdbalict6afooklqi5o.xn--p1ai/" target="_blank" rel="noopener">
+      <div class="ico">&#128176;</div>
+      <div class="info"><div class="name">ПФКИ &mdash; Президентский фонд культурных инициатив</div><div class="desc">Гранты 3-15 млн руб. на VR-проекты в культуре</div><div class="link">фондкультурныхинициатив.рф</div></div>
+    </a>
+    <a class="res" href="https://vizzion.ru/" target="_blank" rel="noopener">
+      <div class="ico">&#129405;</div>
+      <div class="info"><div class="name">Vizzion Group &mdash; Дистрибуция VR</div><div class="desc">Крупнейший дистрибутор Pico/DPVR в РФ, поставки по 44-ФЗ</div><div class="link">vizzion.ru</div></div>
+    </a>
+    <a class="res" href="https://vrconcept.net/" target="_blank" rel="noopener">
+      <div class="ico">&#128295;</div>
+      <div class="info"><div class="name">VR Concept</div><div class="desc">Промышленный VR, официальный партнёр Pico Enterprise</div><div class="link">vrconcept.net</div></div>
+    </a>
+    <a class="res" href="https://vinchi-interactive.ru/" target="_blank" rel="noopener">
+      <div class="ico">&#127912;</div>
+      <div class="info"><div class="name">Vinchi Interactive</div><div class="desc">Крупнейший интегратор мультимедиа в музеях РФ (437 мультимедиагидов)</div><div class="link">vinchi-interactive.ru</div></div>
+    </a>
+    <a class="res" href="https://modumlab.com/" target="_blank" rel="noopener">
+      <div class="ico">&#129514;</div>
+      <div class="info"><div class="name">Modum Lab</div><div class="desc">VR-тренажёры для &laquo;Газпром&raquo;, &laquo;Росатом&raquo;, партнёрство с ИТМО</div><div class="link">modumlab.com</div></div>
+    </a>
+    <a class="res" href="https://varwin.com/" target="_blank" rel="noopener">
+      <div class="ico">&#9889;</div>
+      <div class="info"><div class="name">Varwin &mdash; No-code VR платформа</div><div class="desc">Российская платформа для создания VR-контента без программирования</div><div class="link">varwin.com</div></div>
+    </a>
+    <a class="res" href="https://hermitagemuseum.org/" target="_blank" rel="noopener">
+      <div class="ico">&#127963;</div>
+      <div class="info"><div class="name">Государственный Эрмитаж &mdash; Виртуальный визит</div><div class="desc">360-панорамы по залам, миллионы просмотров</div><div class="link">hermitagemuseum.org</div></div>
+    </a>
+    <a class="res" href="https://www.picoxr.com/business" target="_blank" rel="noopener">
+      <div class="ico">&#128241;</div>
+      <div class="info"><div class="name">Pico for Business</div><div class="desc">Enterprise VR-решения, MDM, централизованное управление парком</div><div class="link">picoxr.com/business</div></div>
+    </a>
+  </div>
+</div>
+
+</main>
+<footer>VR-экосистема СПб &bull; Глава 2. Российский рынок VR/AR &bull; Claude+DVN, 2026</footer>
+
+<script>
+var C={accent:'#6366f1',green:'#22c55e',amber:'#f59e0b',cyan:'#06b6d4',pink:'#ec4899',purple:'#8b5cf6',red:'#ef4444',orange:'#f97316'};
+var darkBg='#1a1a2e';
+
+// 1. Russian market timeline
+(function(){
+  var ch=echarts.init(document.getElementById('ch_timeline'),'dark');
+  var years=['2019','2020','2021','2022','2023','2024','2025','2026','2027п','2030п'];
+  var valRub=[1.0,1.3,1.8,2.5,3.5,5.0,7.0,9.8,13.5,37.5];
+  var growthPct=[null,30,38,39,40,43,40,40,35,31];
+  ch.setOption({
+    backgroundColor:darkBg,
+    tooltip:{trigger:'axis',formatter:function(p){
+      var i=p[0].dataIndex;
+      var s='<b>'+years[i]+'</b><br>Объём: <b>₽'+valRub[i]+' млрд</b>';
+      if(growthPct[i]!==null) s+='<br>Рост: <b>+'+growthPct[i]+'%</b>';
+      return s;
+    }},
+    toolbox:{right:10,feature:{saveAsImage:{title:'Сохранить PNG'}}},
+    legend:{top:5,textStyle:{color:'#ccc'}},
+    grid:{left:55,right:55,bottom:40,top:55},
+    xAxis:{type:'category',data:years,axisLabel:{color:'#aaa'},boundaryGap:true},
+    yAxis:[
+      {type:'value',name:'₽ млрд',axisLabel:{color:'#aaa',formatter:'₽{value}'},splitLine:{lineStyle:{color:'#333'}},nameTextStyle:{color:'#aaa'}},
+      {type:'value',name:'Рост, %',axisLabel:{color:'#aaa',formatter:'{value}%'},splitLine:{show:false},nameTextStyle:{color:'#aaa'},max:50}
+    ],
+    series:[
+      {name:'Объём рынка',type:'bar',data:valRub.map(function(v,i){
+        return {value:v,itemStyle:{color:i>=8?'rgba(99,102,241,0.4)':C.accent}};
+      }),barWidth:'50%',
+        label:{show:true,position:'top',color:'#aaa',fontSize:10,formatter:function(p){return '₽'+p.value}}},
+      {name:'Рост г/г',type:'line',yAxisIndex:1,data:growthPct,
+        lineStyle:{color:C.green,width:2},itemStyle:{color:C.green},symbol:'circle',symbolSize:6,connectNulls:true,
+        markLine:{data:[{xAxis:'2026',label:{formatter:'Сейчас',color:C.amber,fontSize:10},lineStyle:{color:C.amber,type:'dashed'}}],symbol:'none'}}
+    ]
+  });
+  window.addEventListener('resize',function(){ch.resize()});
+})();
+
+// 2. Market segments (Russian)
+(function(){
+  var ch=echarts.init(document.getElementById('ch_segments'),'dark');
+  ch.setOption({
+    backgroundColor:darkBg,
+    tooltip:{trigger:'item',formatter:function(p){return '<b>'+p.name+'</b><br>Доля: '+p.percent+'%<br>~₽'+p.data.vol+' млрд'}},
+    series:[{type:'pie',radius:['30%','68%'],center:['50%','55%'],
+      label:{color:'#ccc',fontSize:11,formatter:'{b}\n{d}%'},
+      data:[
+        {value:42.5,name:'Промышленность',vol:'2,0-2,25',itemStyle:{color:C.accent}},
+        {value:23.5,name:'Развлечения',vol:'1,1-1,25',itemStyle:{color:C.purple}},
+        {value:16.5,name:'Образование',vol:'0,75-0,9',itemStyle:{color:C.cyan}},
+        {value:7.5,name:'Медицина',vol:'0,35-0,4',itemStyle:{color:C.pink}},
+        {value:6,name:'Культура',vol:'0,25-0,35',itemStyle:{color:C.amber,
+          borderColor:C.amber,borderWidth:3,shadowBlur:12,shadowColor:'rgba(245,158,11,0.35)'}},
+        {value:4,name:'Прочие',vol:'0,15-0,25',itemStyle:{color:'#475569'}}
+      ],emphasis:{itemStyle:{shadowBlur:12}}}]
+  });
+  window.addEventListener('resize',function(){ch.resize()});
+})();
+
+// 3. Russia vs World (grouped bar)
+(function(){
+  var ch=echarts.init(document.getElementById('ch_ruvsworld'),'dark');
+  var cats=['Промышл.','Развлеч.','Образов.','Медицина','Культура','Прочие'];
+  var ru=[42.5,23.5,16.5,7.5,6,4];
+  var world=[28,24,11,12,5,20];
+  ch.setOption({
+    backgroundColor:darkBg,
+    tooltip:{trigger:'axis',formatter:function(p){return '<b>'+p[0].axisValue+'</b><br>'+p.map(function(s){return s.marker+s.seriesName+': <b>'+s.value+'%</b>'}).join('<br>')}},
+    legend:{top:5,textStyle:{color:'#ccc'}},
+    grid:{left:40,right:20,bottom:60,top:45},
+    xAxis:{type:'category',data:cats,axisLabel:{color:'#aaa',fontSize:10,rotate:25}},
+    yAxis:{type:'value',name:'% рынка',axisLabel:{color:'#aaa'},splitLine:{lineStyle:{color:'#333'}},max:50},
+    series:[
+      {name:'Россия',type:'bar',data:ru.map(function(v,i){return {value:v,itemStyle:{color:i===4?C.amber:C.accent}}}),barWidth:'35%'},
+      {name:'Мир',type:'bar',data:world.map(function(v,i){return {value:v,itemStyle:{color:i===4?'rgba(245,158,11,0.4)':'rgba(99,102,241,0.3)'}}}),barWidth:'35%'}
+    ]
+  });
+  window.addEventListener('resize',function(){ch.resize()});
+})();
+
+// 4. Equipment pricing
+(function(){
+  var ch=echarts.init(document.getElementById('ch_prices'),'dark');
+  var devices=['Pico 4','Pico 4 Ultra','Pico G3 Ent.','DPVR E4','HTC Vive XR','Meta Quest 3','Meta Quest 3S','Apple Vision Pro'];
+  var priceRu=[38500,60000,50000,55000,105000,60000,42500,600000];
+  var priceWorld=[38600,53900,40400,44900,71900,44900,26900,314900];
+  var official=[true,true,true,true,false,false,false,false];
+  ch.setOption({
+    backgroundColor:darkBg,
+    tooltip:{trigger:'axis',formatter:function(p){
+      var i=p[0].dataIndex;
+      var markup=priceRu[i]>0&&priceWorld[i]>0?Math.round((priceRu[i]/priceWorld[i]-1)*100):0;
+      return '<b>'+devices[i]+'</b><br>'+
+        p.map(function(s){return s.marker+s.seriesName+': <b>₽'+s.value.toLocaleString()+'</b>'}).join('<br>')+
+        '<br>Наценка: <b>'+markup+'%</b>'+
+        '<br>Канал: <b>'+(official[i]?'✅ Официальный':'⚠️ Серый рынок')+'</b>';
+    }},
+    legend:{top:5,textStyle:{color:'#ccc'}},
+    grid:{left:120,right:30,bottom:40,top:45},
+    xAxis:{type:'value',name:'₽ (руб.)',axisLabel:{color:'#aaa',formatter:function(v){return v>=1000?'₽'+Math.round(v/1000)+'K':'₽'+v}},splitLine:{lineStyle:{color:'#333'}},max:650000},
+    yAxis:{type:'category',data:devices,axisLabel:{color:'#ccc',fontSize:10}},
+    series:[
+      {name:'Цена в РФ',type:'bar',data:priceRu.map(function(v,i){return {value:v,
+        itemStyle:{color:official[i]?C.green:'rgba(239,68,68,0.6)',borderColor:official[i]?C.green:C.red,borderWidth:1}}}),barWidth:'35%',
+        label:{show:true,position:'right',color:'#aaa',fontSize:9,formatter:function(p){return '₽'+Math.round(p.value/1000)+'K'}}},
+      {name:'Мировая цена (экв.)',type:'bar',data:priceWorld,
+        itemStyle:{color:'rgba(148,163,184,0.25)',borderColor:'#64748b',borderWidth:1},barWidth:'35%'}
+    ]
+  });
+  window.addEventListener('resize',function(){ch.resize()});
+})();
+
+// 5. Government funding scatter
+(function(){
+  var ch=echarts.init(document.getElementById('ch_gov'),'dark');
+  var funds=[
+    {name:'Минцифры (ИТ-гранты)',avail:500,prob:7},
+    {name:'НП «Экономика данных»',avail:100,prob:8},
+    {name:'Бюджет СПб',avail:30,prob:20},
+    {name:'Фонд «Сколково»',avail:300,prob:12},
+    {name:'ПФКИ',avail:15,prob:12},
+    {name:'Минкультуры (госзад.)',avail:10,prob:25},
+    {name:'Региональные гранты',avail:5,prob:18}
+  ];
+  ch.setOption({
+    backgroundColor:darkBg,
+    tooltip:{formatter:function(p){
+      var d=funds[p.dataIndex];
+      return '<b>'+d.name+'</b><br>Доступно: <b>до ₽'+d.avail+' млн</b><br>Вероятность: <b>'+d.prob+'%</b>';
+    }},
+    toolbox:{right:10,feature:{saveAsImage:{title:'PNG'}}},
+    grid:{left:50,right:30,bottom:50,top:20},
+    xAxis:{type:'value',name:'Доступный объём (₽ млн)',axisLabel:{color:'#aaa'},splitLine:{lineStyle:{color:'#333'}},nameTextStyle:{color:'#aaa'},max:550},
+    yAxis:{type:'value',name:'Вероятность (%)',axisLabel:{color:'#aaa'},splitLine:{lineStyle:{color:'#333'}},nameTextStyle:{color:'#aaa'},max:30},
+    series:[{type:'scatter',symbolSize:function(d,p){return Math.max(18,Math.sqrt(funds[p.dataIndex].avail)*2.5)},
+      data:funds.map(function(f){return [f.avail,f.prob]}),
+      label:{show:true,position:'top',formatter:function(p){return funds[p.dataIndex].name},color:'#ccc',fontSize:9},
+      itemStyle:{color:function(p){var f=funds[p.dataIndex];return f.prob>=20?C.green:f.prob>=12?C.amber:C.accent}}}]
+  });
+  window.addEventListener('resize',function(){ch.resize()});
+})();
+
+// 6. Pushkin Card growth
+(function(){
+  var ch=echarts.init(document.getElementById('ch_pushkin'),'dark');
+  var years=['2021*','2022','2023','2024о','2025п'];
+  var cards=[3.7,8,10,10.5,11];
+  var tickets=[5,28,37,42,45];
+  var revenue=[2,18,25,30,33];
+  ch.setOption({
+    backgroundColor:darkBg,
+    tooltip:{trigger:'axis',formatter:function(p){
+      return '<b>'+p[0].axisValue+'</b><br>'+p.map(function(s){return s.marker+s.seriesName+': <b>'+s.value+(s.seriesIndex===2?' млрд ₽':' млн')+'</b>'}).join('<br>');
+    }},
+    legend:{top:5,textStyle:{color:'#ccc'}},
+    grid:{left:50,right:55,bottom:35,top:55},
+    xAxis:{type:'category',data:years,axisLabel:{color:'#aaa'}},
+    yAxis:[
+      {type:'value',name:'млн',axisLabel:{color:'#aaa'},splitLine:{lineStyle:{color:'#333'}}},
+      {type:'value',name:'₽ млрд',axisLabel:{color:'#aaa'},splitLine:{show:false}}
+    ],
+    series:[
+      {name:'Карт выпущено (млн)',type:'bar',data:cards,
+        itemStyle:{color:'rgba(139,92,246,0.5)'},barWidth:'25%'},
+      {name:'Билетов (млн)',type:'bar',data:tickets,
+        itemStyle:{color:C.purple},barWidth:'25%'},
+      {name:'Оборот (₽ млрд)',type:'line',yAxisIndex:1,data:revenue,
+        lineStyle:{color:C.pink,width:3},itemStyle:{color:C.pink},symbol:'circle',symbolSize:8,
+        areaStyle:{color:{type:'linear',x:0,y:0,x2:0,y2:1,colorStops:[{offset:0,color:'rgba(236,72,153,0.15)'},{offset:1,color:'transparent'}]}}}
+    ]
+  });
+  window.addEventListener('resize',function(){ch.resize()});
+})();
+
+// 7. Studios scatter
+(function(){
+  var ch=echarts.init(document.getElementById('ch_studios'),'dark');
+  var studios=[
+    {name:'Медиафабрика',x:95,y:90,s:40,city:'СПб',color:C.pink},
+    {name:'Vinchi Interactive',x:80,y:85,s:35,city:'Мск',color:C.accent},
+    {name:'iVariant',x:70,y:65,s:20,city:'Мск',color:C.accent},
+    {name:'Immersivity',x:75,y:50,s:18,city:'СПб',color:C.pink},
+    {name:'Modum Lab',x:55,y:80,s:25,city:'М/СПб',color:C.purple},
+    {name:'VR Concept',x:45,y:70,s:22,city:'Мск',color:C.accent},
+    {name:'Varwin',x:50,y:55,s:15,city:'Мск',color:C.accent},
+    {name:'SocSight',x:55,y:40,s:12,city:'Мск',color:C.accent},
+    {name:'Morfeus',x:50,y:45,s:14,city:'М/СПб',color:C.purple},
+    {name:'AVMTechnology',x:45,y:50,s:13,city:'Мск',color:C.accent},
+    {name:'Fibrum',x:35,y:55,s:12,city:'Мск',color:C.accent}
+  ];
+  ch.setOption({
+    backgroundColor:darkBg,
+    tooltip:{formatter:function(p){
+      var d=studios[p.dataIndex];
+      return '<b>'+d.name+'</b> ('+d.city+')<br>Релевантность: <b>'+d.x+'%</b><br>Опыт культурного VR: <b>'+d.y+'%</b>';
+    }},
+    toolbox:{right:10,feature:{saveAsImage:{title:'PNG'}}},
+    grid:{left:60,right:30,bottom:50,top:15},
+    xAxis:{type:'value',name:'Релевантность для проекта',axisLabel:{color:'#aaa',formatter:'{value}%'},splitLine:{lineStyle:{color:'#333'}},nameTextStyle:{color:'#aaa'},min:25,max:100},
+    yAxis:{type:'value',name:'Опыт культурного VR',axisLabel:{color:'#aaa',formatter:'{value}%'},splitLine:{lineStyle:{color:'#333'}},nameTextStyle:{color:'#aaa'},min:30,max:100},
+    series:[{type:'scatter',
+      symbolSize:function(d,p){return studios[p.dataIndex].s},
+      data:studios.map(function(st){return [st.x,st.y]}),
+      label:{show:true,position:'right',formatter:function(p){return studios[p.dataIndex].name},color:'#ccc',fontSize:10},
+      itemStyle:{color:function(p){return studios[p.dataIndex].color},opacity:0.8}
+    }]
+  });
+  window.addEventListener('resize',function(){ch.resize()});
+})();
+
+// 8. SPb projects timeline
+(function(){
+  var ch=echarts.init(document.getElementById('ch_spb'),'dark');
+  var projects=[
+    {name:'Виртуальный визит Эрмитажа (веб)',year:2014,type:'веб',color:'#64748b'},
+    {name:'Эрмитаж VR (Медиафабрика)',year:2020,type:'VR-фильм',color:C.accent},
+    {name:'Петергоф VR (Медиафабрика)',year:2021,type:'VR-фильм',color:C.accent},
+    {name:'Достоевский 360',year:2021,type:'360-видео',color:C.purple},
+    {name:'Китайский дворец (Медиафабрика)',year:2023,type:'VR-фильм',color:C.accent},
+    {name:'ИТМО VR-лаборатории',year:2024,type:'R&D',color:C.cyan},
+    {name:'Мариинский театр 360',year:2024,type:'360-видео',color:C.purple},
+    {name:'Библиотека Маяковского (VR-экосистема)',year:2026,type:'экосистема',color:C.green}
+  ];
+  ch.setOption({
+    backgroundColor:darkBg,
+    tooltip:{formatter:function(p){
+      var d=projects[p.dataIndex];
+      return '<b>'+d.name+'</b><br>Год: '+d.year+'<br>Тип: '+d.type;
+    }},
+    grid:{left:250,right:40,bottom:30,top:10},
+    xAxis:{type:'value',name:'Год',axisLabel:{color:'#aaa',formatter:'{value}'},splitLine:{lineStyle:{color:'#333'}},min:2013,max:2027,interval:2},
+    yAxis:{type:'category',data:projects.map(function(p){return p.name}),axisLabel:{color:'#ccc',fontSize:9}},
+    series:[{type:'scatter',symbolSize:18,
+      data:projects.map(function(p){return p.year}),
+      label:{show:true,position:'right',formatter:function(p){return projects[p.dataIndex].year},color:'#aaa',fontSize:10},
+      itemStyle:{color:function(p){return projects[p.dataIndex].color}},
+      markLine:{data:[{xAxis:2026,label:{formatter:'Запуск экосистемы',color:C.green,fontSize:10},lineStyle:{color:C.green,type:'dashed',width:2}}],symbol:'none',silent:true}
+    }]
+  });
+  window.addEventListener('resize',function(){ch.resize()});
+})();
+</script>
+</body>
+</html>

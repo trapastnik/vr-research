@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Сравнение VR-шлемов — VR-экосистема СПб</title>
+<script src="https://cdn.jsdelivr.net/npm/echarts@5.5.1/dist/echarts.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#0f0f23;--card:#1a1a2e;--text:#e0e0e0;--text2:#8888aa;--accent:#6366f1;--green:#22c55e;--amber:#f59e0b;--cyan:#06b6d4;--red:#ef4444;--pink:#ec4899;--radius:12px}
+body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,-apple-system,sans-serif}
+nav{padding:15px 40px;border-bottom:1px solid #222}nav a{color:var(--accent);text-decoration:none;font-size:.85rem}
+header{padding:30px 40px 10px}header h1{font-size:1.6rem}header p{color:var(--text2);margin-top:6px;font-size:.9rem}
+main{padding:10px 40px 60px;display:grid;gap:24px}
+.chart-card{background:var(--card);border-radius:var(--radius);padding:24px;border:1px solid #222}
+.chart-card h2{font-size:1.1rem;margin-bottom:4px}.chart-card .subtitle{color:var(--text2);font-size:.8rem;margin-bottom:16px}
+.chart-box{width:100%;height:550px}
+.source{color:var(--text2);font-size:.75rem;margin-top:12px;font-style:italic}
+table{width:100%;border-collapse:collapse;font-size:.85rem;margin-top:16px}
+th{background:#222;color:var(--accent);padding:10px 8px;text-align:left;font-weight:600;position:sticky;top:0}
+td{padding:8px;border-bottom:1px solid #333}
+tr:hover td{background:rgba(99,102,241,.05)}
+.best{color:var(--green);font-weight:600}
+.rec{background:rgba(34,197,94,.08)}
+footer{text-align:center;padding:20px;color:var(--text2);font-size:.8rem;border-top:1px solid #222}
+@media(max-width:768px){main{padding:10px 15px}.chart-box{height:400px}table{font-size:.75rem}}
+</style>
+</head>
+<body>
+<nav><a href="index.html">← Все визуализации</a></nav>
+<header><h1>Сравнение VR-шлемов</h1><p>10 моделей: характеристики, цена, доступность в РФ</p></header>
+<main>
+  <div class="chart-card">
+    <h2>Радар-диаграмма: ТОП-5 шлемов</h2>
+    <div class="subtitle">Нормализованные параметры (выше = лучше). Нажмите на легенду для фильтрации.</div>
+    <div id="radar" class="chart-box"></div>
+    <p class="source">Источник: Глава 5, табл. 5.2.1</p>
+  </div>
+  <div class="chart-card">
+    <h2>Цена vs Разрешение (PPD)</h2>
+    <div class="subtitle">Размер = FOV. Зелёные = доступны в РФ.</div>
+    <div id="scatter" class="chart-box"></div>
+    <p class="source">Источник: Глава 5, табл. 5.2.1</p>
+  </div>
+  <div class="chart-card">
+    <h2>Детальная таблица характеристик</h2>
+    <div style="overflow-x:auto">
+    <table>
+      <tr><th>Модель</th><th>Тип</th><th>Разрешение</th><th>PPD</th><th>FOV</th><th>Процессор</th><th>Passthrough</th><th>Цена (₽)</th><th>Доступность в РФ</th></tr>
+      <tr class="rec"><td><b>Pico 4 Ultra</b></td><td>Standalone</td><td>2×2160×2160</td><td class="best">22</td><td>105°</td><td>XR2 Gen 2</td><td>Цветной стерео</td><td>55 000</td><td class="best">Прямые поставки</td></tr>
+      <tr><td>Pico G3 Enterprise</td><td>Standalone</td><td>2×1920×1920</td><td>20</td><td>98°</td><td>XR2</td><td>Монохром</td><td>45 000</td><td class="best">Прямые поставки</td></tr>
+      <tr class="rec"><td><b>DPVR E4</b></td><td>PC VR</td><td>2×2560×2560</td><td class="best">30</td><td>105°</td><td>—(PC)</td><td>Нет</td><td>35 000</td><td class="best">Прямые поставки</td></tr>
+      <tr><td>DPVR E4C</td><td>Standalone</td><td>2×2560×2560</td><td class="best">30</td><td>105°</td><td>XR2 Gen 2</td><td>Цветной</td><td>50 000</td><td class="best">Прямые поставки</td></tr>
+      <tr><td>Meta Quest 3</td><td>Standalone</td><td>2×2064×2208</td><td>25</td><td>110°</td><td>XR2 Gen 2</td><td>Цветной стерео</td><td>55-70 000</td><td style="color:var(--amber)">Параллельный импорт</td></tr>
+      <tr><td>Meta Quest 3S</td><td>Standalone</td><td>2×1832×1920</td><td>20</td><td>96°</td><td>XR2 Gen 2</td><td>Цветной</td><td>35-45 000</td><td style="color:var(--amber)">Параллельный импорт</td></tr>
+      <tr><td>Apple Vision Pro</td><td>Spatial</td><td>2×3660×3200</td><td class="best">34</td><td>100°</td><td>M2+R1</td><td>HDR стерео</td><td>450-550 000</td><td style="color:var(--red)">Серый импорт</td></tr>
+    </table>
+    </div>
+    <p class="source">Источник: Глава 5, табл. 5.2.1-5.2.2. Рекомендуемые модели выделены фоном.</p>
+  </div>
+</main>
+<footer>VR-экосистема СПб &bull; Глава 5. Технологический стек &bull; 2026</footer>
+<script>
+const C={accent:'#6366f1',green:'#22c55e',amber:'#f59e0b',cyan:'#06b6d4',pink:'#ec4899'};
+
+// Radar
+const c1=echarts.init(document.getElementById('radar'),'dark');
+c1.setOption({
+  backgroundColor:'#1a1a2e',
+  tooltip:{},
+  legend:{top:5,textStyle:{color:'#ccc'}},
+  radar:{
+    indicator:[
+      {name:'Разрешение (PPD)',max:35},
+      {name:'FOV',max:120},
+      {name:'Автономность\n(часы)',max:4},
+      {name:'Цена\n(инверс., выше=дешевле)',max:100},
+      {name:'Passthrough\nкачество',max:10},
+      {name:'Доступность\nв РФ',max:10}
+    ],
+    shape:'circle',
+    splitArea:{areaStyle:{color:['rgba(99,102,241,0.02)','rgba(99,102,241,0.05)']}},
+    axisLine:{lineStyle:{color:'#444'}},splitLine:{lineStyle:{color:'#333'}},
+    axisName:{color:'#aaa',fontSize:10}
+  },
+  series:[{type:'radar',data:[
+    {value:[22,105,3,82,8,10],name:'Pico 4 Ultra',lineStyle:{color:C.accent,width:2},itemStyle:{color:C.accent},areaStyle:{color:'rgba(99,102,241,0.12)'}},
+    {value:[30,105,0,86,0,10],name:'DPVR E4',lineStyle:{color:C.cyan,width:2},itemStyle:{color:C.cyan},areaStyle:{color:'rgba(6,182,212,0.1)'}},
+    {value:[30,105,3,80,6,10],name:'DPVR E4C',lineStyle:{color:C.green,width:2},itemStyle:{color:C.green},areaStyle:{color:'rgba(34,197,94,0.1)'}},
+    {value:[25,110,2.5,72,9,5],name:'Meta Quest 3',lineStyle:{color:C.amber,width:2},itemStyle:{color:C.amber},areaStyle:{color:'rgba(245,158,11,0.08)'}},
+    {value:[34,100,2,8,10,2],name:'Apple Vision Pro',lineStyle:{color:'#fff',width:1,type:'dashed'},itemStyle:{color:'#fff'},areaStyle:{color:'rgba(255,255,255,0.03)'}}
+  ]}]
+});
+
+// Scatter: Price vs PPD
+const c2=echarts.init(document.getElementById('scatter'),'dark');
+const devices=[
+  {name:'Pico 4 Ultra',price:55,ppd:22,fov:105,ru:true},
+  {name:'Pico G3 Ent.',price:45,ppd:20,fov:98,ru:true},
+  {name:'DPVR E4',price:35,ppd:30,fov:105,ru:true},
+  {name:'DPVR E4C',price:50,ppd:30,fov:105,ru:true},
+  {name:'Meta Quest 3',price:62,ppd:25,fov:110,ru:false},
+  {name:'Meta Quest 3S',price:40,ppd:20,fov:96,ru:false},
+  {name:'Apple Vision Pro',price:500,ppd:34,fov:100,ru:false}
+];
+c2.setOption({
+  backgroundColor:'#1a1a2e',
+  tooltip:{formatter:function(p){const d=devices[p.dataIndex];return '<b>'+d.name+'</b><br>Цена: '+d.price+'K ₽<br>PPD: '+d.ppd+'<br>FOV: '+d.fov+'°<br>РФ: '+(d.ru?'Прямые поставки':'Импорт')}},
+  toolbox:{right:10,feature:{saveAsImage:{title:'PNG'}}},
+  grid:{left:60,right:30,bottom:50,top:20},
+  xAxis:{type:'value',name:'Цена (тыс. ₽)',nameLocation:'center',nameGap:30,axisLabel:{color:'#aaa'},splitLine:{lineStyle:{color:'#333'}},max:120},
+  yAxis:{type:'value',name:'Разрешение (PPD)',nameLocation:'center',nameGap:40,axisLabel:{color:'#aaa'},splitLine:{lineStyle:{color:'#333'}}},
+  series:[{type:'scatter',
+    data:devices.filter(d=>d.price<=120).map(d=>[d.price,d.ppd]),
+    symbolSize:function(d,p){return devices.filter(x=>x.price<=120)[p.dataIndex].fov/5},
+    itemStyle:{color:function(p){return devices.filter(x=>x.price<=120)[p.dataIndex].ru?C.green:C.amber},borderColor:'#fff',borderWidth:1},
+    label:{show:true,position:'top',formatter:function(p){return devices.filter(x=>x.price<=120)[p.dataIndex].name},color:'#ccc',fontSize:10}
+  }]
+});
+
+window.addEventListener('resize',()=>{[c1,c2].forEach(c=>c.resize())});
+</script>
+</body>
+</html>

@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Вклад каналов — Мониторинг Telegram</title>
+<script src="https://cdn.jsdelivr.net/npm/echarts@5.5.1/dist/echarts.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#0f0f23;--card:#1a1a2e;--text:#e0e0e0;--text2:#8888aa;--accent:#6366f1;--radius:12px}
+body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,sans-serif}
+nav{padding:15px 40px;border-bottom:1px solid #222}nav a{color:var(--accent);text-decoration:none;font-size:.85rem}
+header{padding:30px 40px 10px;max-width:1400px;margin:auto}
+header h1{font-size:1.6rem;font-weight:700;background:linear-gradient(135deg,var(--accent),#06b6d4);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+header p{color:var(--text2);margin-top:6px;font-size:.9rem}
+main{padding:20px 40px 60px;max-width:1400px;margin:auto;display:grid;grid-template-columns:1fr 1fr;gap:24px}
+.chart-card{background:var(--card);border-radius:var(--radius);padding:24px;border:1px solid #222}
+.chart-card h2{font-size:1.1rem;margin-bottom:4px}
+.chart-card .sub{color:var(--text2);font-size:.8rem;margin-bottom:16px}
+.chart-box{width:100%;height:500px}
+.full{grid-column:1/3}
+.table-card{background:var(--card);border-radius:var(--radius);padding:24px;border:1px solid #222;grid-column:1/3}
+table{width:100%;border-collapse:collapse;font-size:.85rem;margin-top:12px}
+th{text-align:left;color:var(--accent);padding:10px;border-bottom:1px solid #333;font-weight:600}
+td{padding:10px;border-bottom:1px solid #222}
+tr:hover td{background:rgba(99,102,241,.03)}
+.bar{height:8px;border-radius:4px;background:var(--accent)}
+@media(max-width:768px){main{grid-template-columns:1fr}.full,.table-card{grid-column:1}}
+</style>
+</head>
+<body>
+<nav><a href="../monitoring-viz/">← Мониторинг</a></nav>
+<header>
+<h1>📡 Вклад Telegram-каналов</h1>
+<p>8 каналов · 15 482 сообщения · 3 393 релевантных</p>
+</header>
+<main>
+<div class="chart-card">
+<h2>Релевантные публикации</h2>
+<div class="sub">Внутреннее кольцо — релевантные, внешнее — общее</div>
+<div class="chart-box" id="donutChart"></div>
+</div>
+<div class="chart-card">
+<h2>Эффективность каналов</h2>
+<div class="sub">Процент релевантных сообщений от общего числа</div>
+<div class="chart-box" id="effChart"></div>
+</div>
+<div class="table-card">
+<h2>Детальная статистика каналов</h2>
+<table>
+<thead><tr><th>Канал</th><th>Всего</th><th>Релевантных</th><th>Доля</th><th>Охват</th></tr></thead>
+<tbody id="tableBody"></tbody>
+</table>
+</div>
+</main>
+<script>
+const channels = [
+  {name: 'Нейронавт | Нейросети в творчестве', total: 4514, relevant: 1225, color: '#6366f1'},
+  {name: 'Метаверсище и ИИще', total: 3704, relevant: 941, color: '#ec4899'},
+  {name: 'ИИ — svodka.ai', total: 1659, relevant: 454, color: '#22c55e'},
+  {name: 'Квест Теория Каст и Ролей', total: 1752, relevant: 276, color: '#f59e0b'},
+  {name: 'GPT/ChatGPT/AI Central', total: 1439, relevant: 215, color: '#06b6d4'},
+  {name: 'gonzo-обзоры ML статей', total: 1416, relevant: 139, color: '#8b5cf6'},
+  {name: 'Малоизвестное интересное', total: 308, relevant: 90, color: '#f97316'},
+  {name: 'Борис опять', total: 690, relevant: 53, color: '#64748b'}
+];
+
+const totalRelevant = 3393;
+
+// Donut chart
+const donut = echarts.init(document.getElementById('donutChart'), 'dark');
+donut.setOption({
+  backgroundColor: 'transparent',
+  tooltip: {
+    trigger: 'item',
+    formatter: '{b}<br/>Публикаций: {c} ({d}%)'
+  },
+  series: [
+    {
+      name: 'Релевантные',
+      type: 'pie',
+      radius: ['35%', '55%'],
+      label: { show: false },
+      data: channels.map(c => ({name: c.name, value: c.relevant, itemStyle: {color: c.color}}))
+    },
+    {
+      name: 'Все сообщения',
+      type: 'pie',
+      radius: ['60%', '72%'],
+      label: { fontSize: 10, color: '#8888aa' },
+      labelLine: { length: 10, length2: 8 },
+      data: channels.map(c => ({name: c.name, value: c.total, itemStyle: {color: c.color, opacity: 0.4}}))
+    }
+  ]
+});
+
+// Efficiency bar chart
+const eff = echarts.init(document.getElementById('effChart'), 'dark');
+const sorted = [...channels].sort((a, b) => (b.relevant/b.total) - (a.relevant/a.total));
+eff.setOption({
+  backgroundColor: 'transparent',
+  tooltip: {
+    trigger: 'axis',
+    formatter: function(p) {
+      const ch = sorted[p[0].dataIndex];
+      return `<b>${ch.name}</b><br/>Релевантных: ${ch.relevant} из ${ch.total}<br/>Доля: ${(ch.relevant/ch.total*100).toFixed(1)}%`;
+    }
+  },
+  grid: { top: 10, right: 80, bottom: 10, left: 220 },
+  xAxis: { type: 'value', max: 35, axisLabel: { formatter: '{value}%' } },
+  yAxis: {
+    type: 'category',
+    data: sorted.map(c => c.name),
+    axisLabel: { fontSize: 11, width: 200, overflow: 'truncate' }
+  },
+  series: [{
+    type: 'bar',
+    data: sorted.map(c => ({
+      value: +(c.relevant/c.total*100).toFixed(1),
+      itemStyle: { color: c.color, borderRadius: [0, 4, 4, 0] }
+    })),
+    barWidth: 22,
+    label: { show: true, position: 'right', formatter: '{c}%', fontSize: 12, color: '#e0e0e0' }
+  }]
+});
+
+// Table
+const tbody = document.getElementById('tableBody');
+channels.forEach(c => {
+  const pct = (c.relevant/c.total*100).toFixed(1);
+  const share = (c.relevant/totalRelevant*100).toFixed(1);
+  const barW = (c.relevant/1225*100).toFixed(0);
+  tbody.innerHTML += `<tr>
+    <td style="color:${c.color};font-weight:600">${c.name}</td>
+    <td>${c.total.toLocaleString()}</td>
+    <td>${c.relevant.toLocaleString()}</td>
+    <td>${pct}%</td>
+    <td><div class="bar" style="width:${barW}%;background:${c.color}"></div> ${share}%</td>
+  </tr>`;
+});
+
+window.addEventListener('resize', () => { donut.resize(); eff.resize(); });
+</script>
+</body>
+</html>

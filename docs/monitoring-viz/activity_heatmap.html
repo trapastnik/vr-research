@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Тепловая карта активности — Мониторинг Telegram</title>
+<script src="https://cdn.jsdelivr.net/npm/echarts@5.5.1/dist/echarts.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#0f0f23;--card:#1a1a2e;--text:#e0e0e0;--text2:#8888aa;--accent:#6366f1;--radius:12px}
+body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,sans-serif}
+nav{padding:15px 40px;border-bottom:1px solid #222}nav a{color:var(--accent);text-decoration:none;font-size:.85rem}
+header{padding:30px 40px 10px;max-width:1400px;margin:auto}
+header h1{font-size:1.6rem;font-weight:700;background:linear-gradient(135deg,var(--accent),#06b6d4);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+header p{color:var(--text2);margin-top:6px;font-size:.9rem}
+main{padding:20px 40px 60px;max-width:1400px;margin:auto}
+.chart-card{background:var(--card);border-radius:var(--radius);padding:24px;border:1px solid #222}
+.chart-card h2{font-size:1.1rem;margin-bottom:4px}
+.chart-card .sub{color:var(--text2);font-size:.8rem;margin-bottom:16px}
+#heatmap{width:100%;height:600px}
+</style>
+</head>
+<body>
+<nav><a href="../monitoring-viz/">← Мониторинг</a></nav>
+<header>
+<h1>🔥 Тепловая карта активности</h1>
+<p>Интенсивность публикаций по категориям и месяцам</p>
+</header>
+<main>
+<div class="chart-card">
+<h2>Категория × Месяц</h2>
+<div class="sub">Яркость ячейки пропорциональна числу публикаций. Наведите курсор для деталей.</div>
+<div id="heatmap"></div>
+</div>
+</main>
+<script>
+const months = ['Мар 25','Апр','Май','Июн','Июл','Авг','Сен','Окт','Ноя','Дек','Янв 26','Фев'];
+const categories = [
+  'Volumetric Capture',
+  'VR/AR шлемы',
+  'Unity / Unreal',
+  'LiDAR / Фотограмметрия',
+  'Метавселенная / VR',
+  'Генерация миров',
+  'Gaussian Splatting',
+  '3D генерация',
+  'Аватары / MoCap',
+  'Генеративная музыка',
+  'Культура / Музеи',
+  'Генеративное видео',
+  'Робототехника / AI'
+];
+
+// Data: [monthIndex, categoryIndex, value]
+const rawData = [
+  // Volumetric Capture (cat 0)
+  [0,0,0],[1,0,0],[2,0,1],[3,0,0],[4,0,1],[5,0,1],[6,0,0],[7,0,0],[8,0,0],[9,0,3],[10,0,1],[11,0,2],
+  // VR/AR шлемы (cat 1)
+  [0,1,3],[1,1,1],[2,1,1],[3,1,3],[4,1,1],[5,1,3],[6,1,5],[7,1,6],[8,1,1],[9,1,2],[10,1,1],[11,1,1],
+  // Unity / Unreal (cat 2)
+  [0,2,3],[1,2,0],[2,2,2],[3,2,5],[4,2,3],[5,2,1],[6,2,5],[7,2,1],[8,2,2],[9,2,3],[10,2,3],[11,2,2],
+  // LiDAR / Фотограмметрия (cat 3)
+  [0,3,3],[1,3,1],[2,3,8],[3,3,6],[4,3,4],[5,3,6],[6,3,4],[7,3,4],[8,3,4],[9,3,4],[10,3,6],[11,3,5],
+  // Метавселенная / VR (cat 4)
+  [0,4,5],[1,4,4],[2,4,10],[3,4,7],[4,4,5],[5,4,3],[6,4,4],[7,4,3],[8,4,11],[9,4,3],[10,4,5],[11,4,4],
+  // Генерация миров (cat 5)
+  [0,5,4],[1,5,1],[2,5,3],[3,5,4],[4,5,1],[5,5,22],[6,5,3],[7,5,3],[8,5,3],[9,5,10],[10,5,21],[11,5,13],
+  // Gaussian Splatting (cat 6)
+  [0,6,8],[1,6,5],[2,6,8],[3,6,8],[4,6,8],[5,6,13],[6,6,11],[7,6,12],[8,6,9],[9,6,14],[10,6,10],[11,6,7],
+  // 3D генерация (cat 7)
+  [0,7,14],[1,7,13],[2,7,6],[3,7,9],[4,7,11],[5,7,9],[6,7,19],[7,7,5],[8,7,10],[9,7,18],[10,7,12],[11,7,0],
+  // Аватары / MoCap (cat 8)
+  [0,8,15],[1,8,21],[2,8,27],[3,8,24],[4,8,22],[5,8,27],[6,8,33],[7,8,18],[8,8,11],[9,8,28],[10,8,22],[11,8,27],
+  // Генеративная музыка (cat 9)
+  [0,9,39],[1,9,26],[2,9,57],[3,9,47],[4,9,45],[5,9,65],[6,9,73],[7,9,60],[8,9,55],[9,9,59],[10,9,43],[11,9,57],
+  // Культура / Музеи (cat 10)
+  [0,10,54],[1,10,41],[2,10,53],[3,10,62],[4,10,68],[5,10,59],[6,10,80],[7,10,116],[8,10,82],[9,10,83],[10,10,73],[11,10,71],
+  // Генеративное видео (cat 11)
+  [0,11,63],[1,11,57],[2,11,81],[3,11,98],[4,11,109],[5,11,97],[6,11,105],[7,11,142],[8,11,64],[9,11,118],[10,11,70],[11,11,121],
+  // Робототехника / AI (cat 12)
+  [0,12,61],[1,12,69],[2,12,88],[3,12,68],[4,12,85],[5,12,112],[6,12,118],[7,12,127],[8,12,108],[9,12,119],[10,12,97],[11,12,113]
+];
+
+const chart = echarts.init(document.getElementById('heatmap'), 'dark');
+chart.setOption({
+  backgroundColor: 'transparent',
+  tooltip: {
+    position: 'top',
+    formatter: function(p) {
+      return `<b>${categories[p.value[1]]}</b><br/>${months[p.value[0]]}: <b>${p.value[2]}</b> публикаций`;
+    }
+  },
+  grid: { top: 10, right: 80, bottom: 40, left: 200 },
+  xAxis: {
+    type: 'category',
+    data: months,
+    splitArea: { show: true },
+    axisLabel: { fontSize: 11 }
+  },
+  yAxis: {
+    type: 'category',
+    data: categories,
+    axisLabel: { fontSize: 11, width: 180, overflow: 'truncate' },
+    splitArea: { show: true }
+  },
+  visualMap: {
+    min: 0,
+    max: 142,
+    calculable: true,
+    orient: 'vertical',
+    right: 0,
+    top: 'center',
+    inRange: {
+      color: ['#1a1a2e', '#1e3a5f', '#2563eb', '#6366f1', '#a855f7', '#ec4899', '#ef4444']
+    },
+    textStyle: { color: '#8888aa', fontSize: 11 }
+  },
+  series: [{
+    name: 'Публикации',
+    type: 'heatmap',
+    data: rawData,
+    label: {
+      show: true,
+      fontSize: 10,
+      color: '#fff',
+      formatter: function(p) {
+        return p.value[2] > 0 ? p.value[2] : '';
+      }
+    },
+    emphasis: {
+      itemStyle: { shadowBlur: 10, shadowColor: 'rgba(0,0,0,0.5)' }
+    }
+  }]
+});
+
+window.addEventListener('resize', () => chart.resize());
+</script>
+</body>
+</html>

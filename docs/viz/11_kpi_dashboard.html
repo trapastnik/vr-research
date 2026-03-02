@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KPI Dashboard — VR-экосистема СПб</title>
+<script src="https://cdn.jsdelivr.net/npm/echarts@5.5.1/dist/echarts.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#0f0f23;--card:#1a1a2e;--text:#e0e0e0;--text2:#8888aa;--accent:#6366f1;--green:#22c55e;--amber:#f59e0b;--red:#ef4444;--cyan:#06b6d4;--radius:12px}
+body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,-apple-system,sans-serif}
+nav{padding:15px 40px;border-bottom:1px solid #222}nav a{color:var(--accent);text-decoration:none;font-size:.85rem}
+header{padding:30px 40px 10px}header h1{font-size:1.6rem}header p{color:var(--text2);margin-top:6px;font-size:.9rem}
+main{padding:10px 40px 60px;display:grid;gap:20px;grid-template-columns:repeat(3,1fr)}
+.chart-card{background:var(--card);border-radius:var(--radius);padding:20px;border:1px solid #222}
+.chart-card.full{grid-column:1/-1}
+.chart-card h2{font-size:.95rem;margin-bottom:4px}
+.sparkline{width:100%;height:200px}
+.source{color:var(--text2);font-size:.75rem;margin-top:8px;font-style:italic}
+footer{text-align:center;padding:20px;color:var(--text2);font-size:.8rem;border-top:1px solid #222}
+@media(max-width:1000px){main{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:600px){main{grid-template-columns:1fr;padding:10px 15px}}
+</style>
+</head>
+<body>
+<nav><a href="index.html">← Все визуализации</a></nav>
+<header><h1>KPI Dashboard 2026-2030</h1><p>12 ключевых метрик проекта</p></header>
+<main id="cards"></main>
+<footer>VR-экосистема СПб &bull; Глава 13. KPI &bull; 2026</footer>
+<script>
+const Y=['2026','2027','2028','2029','2030'];
+const C={accent:'#6366f1',green:'#22c55e',amber:'#f59e0b',red:'#ef4444',cyan:'#06b6d4',pink:'#ec4899'};
+const kpis=[
+  {name:'Точки показа',data:[3,7,10,15,22],unit:'',color:C.accent},
+  {name:'VR-произведений (нараст.)',data:[12,24,44,64,100],unit:'шт.',color:C.green},
+  {name:'Посетителей / год',data:[10,30,70,130,200],unit:'тыс.',color:C.cyan},
+  {name:'Посетителей (нараст.)',data:[10,40,110,240,440],unit:'тыс.',color:C.cyan},
+  {name:'NPS',data:[60,60,65,65,70],unit:'',color:C.green},
+  {name:'B2B-контракты (нараст.)',data:[5,15,25,40,60],unit:'шт.',color:C.amber},
+  {name:'Школ-партнёров',data:[30,100,200,400,500],unit:'',color:C.pink},
+  {name:'Доход',data:[12,20,28,35,41],unit:'млн ₽',color:C.green},
+  {name:'Расходы',data:[22,16,18,22,25],unit:'млн ₽',color:C.red},
+  {name:'Доля госфинансирования',data:[75,60,50,40,30],unit:'%',color:C.amber},
+  {name:'Стоимость 1 посещения',data:[2200,530,260,170,125],unit:'₽',color:C.red},
+  {name:'Команда',data:[8,12,18,24,30],unit:'FTE',color:C.accent}
+];
+const container=document.getElementById('cards');
+kpis.forEach((kpi,idx)=>{
+  const card=document.createElement('div');
+  card.className='chart-card';
+  card.innerHTML='<h2>'+kpi.name+'</h2><div class="sparkline" id="kpi'+idx+'"></div>';
+  container.appendChild(card);
+  const ch=echarts.init(document.getElementById('kpi'+idx),'dark');
+  const isDown=kpi.data[4]<kpi.data[0];
+  ch.setOption({
+    backgroundColor:'#1a1a2e',
+    tooltip:{trigger:'axis',formatter:function(p){return p[0].axisValue+': <b>'+p[0].value+(kpi.unit?' '+kpi.unit:'')+'</b>'}},
+    grid:{left:50,right:15,bottom:25,top:15},
+    xAxis:{type:'category',data:Y,axisLabel:{color:'#777',fontSize:10},axisTick:{show:false},axisLine:{lineStyle:{color:'#333'}}},
+    yAxis:{type:'value',axisLabel:{color:'#777',fontSize:10},splitLine:{lineStyle:{color:'#222'}},splitNumber:3},
+    series:[{
+      type:'line',data:kpi.data,smooth:true,symbol:'circle',symbolSize:6,
+      lineStyle:{color:kpi.color,width:2.5},
+      itemStyle:{color:kpi.color},
+      areaStyle:{color:{type:'linear',x:0,y:0,x2:0,y2:1,colorStops:[{offset:0,color:kpi.color.replace(')',',0.25)').replace('rgb','rgba')},{offset:1,color:'transparent'}]}}
+    }]
+  });
+  window.addEventListener('resize',()=>ch.resize());
+});
+</script>
+</body>
+</html>

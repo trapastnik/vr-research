@@ -1,0 +1,11 @@
+.DS_Store
+__pycache__/
+*.pyc
+*.session
+venv/
+.venv/
+site/
+.env
+telegram_scraper/output/
+telegram_scraper/output_year/
+path/

@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Рост команды — VR-экосистема СПб</title>
+<script src="https://cdn.jsdelivr.net/npm/echarts@5.5.1/dist/echarts.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#0f0f23;--card:#1a1a2e;--text:#e0e0e0;--text2:#8888aa;--accent:#6366f1;--green:#22c55e;--amber:#f59e0b;--cyan:#06b6d4;--pink:#ec4899;--radius:12px}
+body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,-apple-system,sans-serif}
+nav{padding:15px 40px;border-bottom:1px solid #222}nav a{color:var(--accent);text-decoration:none;font-size:.85rem}
+header{padding:30px 40px 10px}header h1{font-size:1.6rem}header p{color:var(--text2);margin-top:6px;font-size:.9rem}
+main{padding:10px 40px 60px;display:grid;gap:24px;grid-template-columns:1fr 1fr}
+.chart-card{background:var(--card);border-radius:var(--radius);padding:24px;border:1px solid #222}
+.chart-card.full{grid-column:1/-1}
+.chart-card h2{font-size:1.1rem;margin-bottom:4px}.chart-card .subtitle{color:var(--text2);font-size:.8rem;margin-bottom:16px}
+.chart-box{width:100%;height:450px}
+.source{color:var(--text2);font-size:.75rem;margin-top:12px;font-style:italic}
+.org{font-family:monospace;font-size:.8rem;line-height:1.6;padding:20px;background:#111;border-radius:8px;overflow-x:auto;white-space:pre;color:var(--text)}
+footer{text-align:center;padding:20px;color:var(--text2);font-size:.8rem;border-top:1px solid #222}
+@media(max-width:900px){main{grid-template-columns:1fr;padding:10px 15px}}
+</style>
+</head>
+<body>
+<nav><a href="index.html">← Все визуализации</a></nav>
+<header><h1>Рост команды</h1><p>8 → 30 FTE за 5 лет. Структура, роли, динамика.</p></header>
+<main>
+  <div class="chart-card full">
+    <h2>Рост команды по категориям (FTE)</h2>
+    <div class="subtitle">Stacked area: операторы, контент, управление, коммерция</div>
+    <div id="team_growth" class="chart-box"></div>
+    <p class="source">Источник: Главы 9, 13</p>
+  </div>
+  <div class="chart-card">
+    <h2>Оргструктура: Фаза 0-1 (8 FTE)</h2>
+    <div class="org">
+                 ┌─────────────────┐
+                 │ Директор проекта │
+                 └────────┬────────┘
+       ┌─────────┬────────┼────────┬──────────┐
+  ┌────┴───┐ ┌───┴────┐ ┌─┴──────┐ ┌┴─────────┐
+  │Тех.    │ │Медиа-  │ │Коорди- │ │Коммерч.  │
+  │менеджер│ │продюсер│ │натор   │ │менеджер  │
+  │ (1)    │ │ (1)    │ │ (1)    │ │ (0.5)    │
+  └──┬─────┘ └──┬─────┘ └────────┘ └──────────┘
+  ┌──┴─────┐ ┌──┴──────┐
+  │Опер-ры │ │Контент- │
+  │VR-точек│ │мейкеры  │
+  │ (2)    │ │ (2)     │
+  └────────┘ └─────────┘</div>
+  </div>
+  <div class="chart-card">
+    <h2>Расходы на персонал</h2>
+    <div id="salary" class="chart-box"></div>
+    <p class="source">Источник: Глава 13, табл. 13.9</p>
+  </div>
+</main>
+<footer>VR-экосистема СПб &bull; Глава 9, 13. Кадры &bull; 2026</footer>
+<script>
+const C={accent:'#6366f1',green:'#22c55e',amber:'#f59e0b',cyan:'#06b6d4',pink:'#ec4899'};
+const Y=['2026','2027','2028','2029','2030'];
+
+const c1=echarts.init(document.getElementById('team_growth'),'dark');
+c1.setOption({
+  backgroundColor:'#1a1a2e',
+  tooltip:{trigger:'axis'},
+  legend:{top:5,textStyle:{color:'#ccc'}},
+  toolbox:{right:10,feature:{saveAsImage:{title:'PNG'}}},
+  grid:{left:50,right:30,bottom:40,top:60},
+  xAxis:{type:'category',data:Y,boundaryGap:false,axisLabel:{color:'#aaa'}},
+  yAxis:{type:'value',name:'FTE',axisLabel:{color:'#aaa'},splitLine:{lineStyle:{color:'#333'}}},
+  series:[
+    {name:'Управление',type:'line',stack:'t',areaStyle:{},data:[2.5,3,3.5,4,5],itemStyle:{color:C.accent},lineStyle:{width:0}},
+    {name:'Контент',type:'line',stack:'t',areaStyle:{},data:[2,4,6,7,8],itemStyle:{color:C.green},lineStyle:{width:0}},
+    {name:'Операторы VR-точек',type:'line',stack:'t',areaStyle:{},data:[2,3,5,8,12],itemStyle:{color:C.cyan},lineStyle:{width:0}},
+    {name:'Коммерция/PR',type:'line',stack:'t',areaStyle:{},data:[0.5,1,2,3,3],itemStyle:{color:C.amber},lineStyle:{width:0}},
+    {name:'Техническая поддержка',type:'line',stack:'t',areaStyle:{},data:[1,1,1.5,2,2],itemStyle:{color:C.pink},lineStyle:{width:0}}
+  ]
+});
+
+const c2=echarts.init(document.getElementById('salary'),'dark');
+c2.setOption({
+  backgroundColor:'#1a1a2e',
+  tooltip:{trigger:'axis',formatter:function(p){return p[0].axisValue+': <b>'+p[0].value+' млн ₽</b>'}},
+  toolbox:{right:10,feature:{saveAsImage:{title:'PNG'}}},
+  grid:{left:60,right:30,bottom:40,top:20},
+  xAxis:{type:'category',data:Y,axisLabel:{color:'#aaa'}},
+  yAxis:{type:'value',name:'млн ₽',axisLabel:{color:'#aaa'},splitLine:{lineStyle:{color:'#333'}}},
+  series:[{type:'bar',data:[5.5,7.2,9,12,15],itemStyle:{color:C.accent},
+    label:{show:true,position:'top',color:'#aaa',fontSize:11,formatter:'{c}M'}}]
+});
+
+window.addEventListener('resize',()=>{[c1,c2].forEach(c=>c.resize())});
+</script>
+</body>
+</html>

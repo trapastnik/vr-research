@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Месячная динамика — Мониторинг Telegram</title>
+<script src="https://cdn.jsdelivr.net/npm/echarts@5.5.1/dist/echarts.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#0f0f23;--card:#1a1a2e;--text:#e0e0e0;--text2:#8888aa;--accent:#6366f1;--radius:12px}
+body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,sans-serif}
+nav{padding:15px 40px;border-bottom:1px solid #222}nav a{color:var(--accent);text-decoration:none;font-size:.85rem}
+header{padding:30px 40px 10px;max-width:1400px;margin:auto}
+header h1{font-size:1.6rem;font-weight:700;background:linear-gradient(135deg,var(--accent),#06b6d4);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+header p{color:var(--text2);margin-top:6px;font-size:.9rem}
+main{padding:20px 40px 60px;max-width:1400px;margin:auto}
+.chart-card{background:var(--card);border-radius:var(--radius);padding:24px;border:1px solid #222;margin-bottom:24px}
+.chart-card h2{font-size:1.1rem;margin-bottom:4px}
+.chart-card .sub{color:var(--text2);font-size:.8rem;margin-bottom:16px}
+#mainChart{width:100%;height:550px}
+#topChart{width:100%;height:400px}
+.facts{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px}
+.fact{background:#16162c;border-radius:10px;padding:16px;text-align:center;border:1px solid #222}
+.fact .val{font-size:1.8rem;font-weight:700}
+.fact .label{font-size:.75rem;color:var(--text2);margin-top:4px}
+.c-accent{color:var(--accent)}.c-green{color:#22c55e}.c-amber{color:#f59e0b}.c-cyan{color:#06b6d4}
+@media(max-width:768px){.facts{grid-template-columns:repeat(2,1fr)}}
+</style>
+</head>
+<body>
+<nav><a href="../monitoring-viz/">← Мониторинг</a></nav>
+<header>
+<h1>📈 Месячная динамика по категориям</h1>
+<p>Март 2025 — Февраль 2026 · 8 Telegram-каналов · 15 482 сообщения</p>
+</header>
+<main>
+<div class="facts">
+<div class="fact"><div class="val c-accent">3 393</div><div class="label">Релевантных публикаций</div></div>
+<div class="fact"><div class="val c-green">13</div><div class="label">Тематических категорий</div></div>
+<div class="fact"><div class="val c-amber">12</div><div class="label">Месяцев мониторинга</div></div>
+<div class="fact"><div class="val c-cyan">22%</div><div class="label">Доля релевантных</div></div>
+</div>
+<div class="chart-card">
+<h2>Все категории — месячная динамика</h2>
+<div class="sub">Нажмите на категорию в легенде, чтобы скрыть/показать линию</div>
+<div id="mainChart"></div>
+</div>
+<div class="chart-card">
+<h2>ТОП-5 категорий — детальная динамика</h2>
+<div class="sub">Область под графиком показывает объём публикаций</div>
+<div id="topChart"></div>
+</div>
+</main>
+<script>
+const months = ['Мар 25','Апр','Май','Июн','Июл','Авг','Сен','Окт','Ноя','Дек','Янв 26','Фев'];
+const monthKeys = ['2025-03','2025-04','2025-05','2025-06','2025-07','2025-08','2025-09','2025-10','2025-11','2025-12','2026-01','2026-02'];
+
+const data = {
+  "Робототехника / Embodied AI": [61,69,88,68,85,112,118,127,108,119,97,113],
+  "Генеративное видео": [63,57,81,98,109,97,105,142,64,118,70,121],
+  "Культура / Музеи / Наследие": [54,41,53,62,68,59,80,116,82,83,73,71],
+  "Генеративная музыка и аудио": [39,26,57,47,45,65,73,60,55,59,43,57],
+  "Аватары и Motion Capture": [15,21,27,24,22,27,33,18,11,28,22,27],
+  "3D генерация": [14,13,6,9,11,9,19,5,10,18,12,0],
+  "Gaussian Splatting / NeRF": [8,5,8,8,8,13,11,12,9,14,10,7],
+  "Генерация интерактивных миров": [4,1,3,4,1,22,3,3,3,10,21,13],
+  "Метавселенная / VR общее": [5,4,10,7,5,3,4,3,11,3,5,4],
+  "LiDAR / Фотограмметрия": [3,1,8,6,4,6,4,4,4,4,6,5],
+  "Unity / Unreal / Движки": [3,0,2,5,3,1,5,1,2,3,3,2],
+  "VR/AR шлемы и устройства": [3,1,1,3,1,3,5,6,1,2,1,1],
+  "Volumetric Capture": [0,0,1,0,1,1,0,0,0,3,1,2]
+};
+
+const colors = ['#ef4444','#f59e0b','#6366f1','#22c55e','#ec4899','#06b6d4','#8b5cf6','#f97316','#64748b','#14b8a6','#a855f7','#3b82f6','#78716c'];
+
+// Main chart — all categories
+const chart1 = echarts.init(document.getElementById('mainChart'), 'dark');
+chart1.setOption({
+  backgroundColor: 'transparent',
+  tooltip: { trigger: 'axis' },
+  legend: { type: 'scroll', bottom: 0, textStyle: { fontSize: 11 } },
+  grid: { top: 20, right: 20, bottom: 80, left: 50 },
+  xAxis: { type: 'category', data: months, axisLabel: { fontSize: 12 } },
+  yAxis: { type: 'value', name: 'Публикации', nameTextStyle: { fontSize: 11 } },
+  dataZoom: [{ type: 'inside' }],
+  series: Object.entries(data).map(([name, values], i) => ({
+    name: name,
+    type: 'line',
+    data: values,
+    smooth: true,
+    symbol: 'circle',
+    symbolSize: 4,
+    lineStyle: { width: i < 5 ? 3 : 1.5, type: i >= 5 ? 'dashed' : 'solid' },
+    itemStyle: { color: colors[i] },
+    emphasis: { lineStyle: { width: 4 } }
+  }))
+});
+
+// Top 5 chart — area
+const top5 = ['Робототехника / Embodied AI', 'Генеративное видео', 'Культура / Музеи / Наследие', 'Генеративная музыка и аудио', 'Аватары и Motion Capture'];
+const chart2 = echarts.init(document.getElementById('topChart'), 'dark');
+chart2.setOption({
+  backgroundColor: 'transparent',
+  tooltip: { trigger: 'axis' },
+  legend: { bottom: 0, textStyle: { fontSize: 11 } },
+  grid: { top: 20, right: 20, bottom: 60, left: 50 },
+  xAxis: { type: 'category', data: months },
+  yAxis: { type: 'value' },
+  series: top5.map((name, i) => ({
+    name: name,
+    type: 'line',
+    data: data[name],
+    smooth: true,
+    areaStyle: { opacity: 0.15 },
+    lineStyle: { width: 2.5 },
+    itemStyle: { color: colors[i] }
+  }))
+});
+
+window.addEventListener('resize', () => { chart1.resize(); chart2.resize(); });
+</script>
+</body>
+</html>

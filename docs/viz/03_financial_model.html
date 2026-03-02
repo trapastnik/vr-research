@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Финансовая модель — VR-экосистема СПб</title>
+<script src="https://cdn.jsdelivr.net/npm/echarts@5.5.1/dist/echarts.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#0f0f23;--card:#1a1a2e;--text:#e0e0e0;--text2:#8888aa;--accent:#6366f1;--green:#22c55e;--amber:#f59e0b;--red:#ef4444;--cyan:#06b6d4;--radius:12px}
+body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,-apple-system,sans-serif;min-height:100vh}
+nav{padding:15px 40px;border-bottom:1px solid #222}
+nav a{color:var(--accent);text-decoration:none;font-size:.85rem}
+nav a:hover{text-decoration:underline}
+header{padding:30px 40px 10px}
+header h1{font-size:1.6rem;font-weight:700}
+header p{color:var(--text2);margin-top:6px;font-size:.9rem}
+main{padding:10px 40px 60px;display:grid;gap:24px}
+.chart-card{background:var(--card);border-radius:var(--radius);padding:24px;border:1px solid #222}
+.chart-card h2{font-size:1.1rem;margin-bottom:4px}
+.chart-card .subtitle{color:var(--text2);font-size:.8rem;margin-bottom:16px}
+.chart-box{width:100%;height:500px}
+.source{color:var(--text2);font-size:.75rem;margin-top:12px;font-style:italic}
+footer{text-align:center;padding:20px;color:var(--text2);font-size:.8rem;border-top:1px solid #222}
+@media(max-width:768px){main{padding:10px 15px}header{padding:20px 15px}.chart-box{height:350px}}
+</style>
+</head>
+<body>
+<nav><a href="index.html">← Все визуализации</a></nav>
+<header>
+  <h1>Финансовая модель: 3 сценария</h1>
+  <p>Консервативный / Базовый / Оптимистичный — проекция доходов и расходов на 2026-2030</p>
+</header>
+<main>
+  <div class="chart-card">
+    <h2>Три сценария: Доходы vs Расходы</h2>
+    <div class="subtitle">Нажмите на легенду чтобы скрыть/показать сценарий</div>
+    <div id="scenarios" class="chart-box"></div>
+    <p class="source">Источник: Глава 11, раздел 11.6</p>
+  </div>
+  <div class="chart-card">
+    <h2>Базовый сценарий: Накопленный баланс</h2>
+    <div class="subtitle">Точка безубыточности — 2027 год</div>
+    <div id="cumulative" class="chart-box"></div>
+    <p class="source">Источник: Глава 11, раздел 11.6, Сценарий 2</p>
+  </div>
+  <div class="chart-card">
+    <h2>Структура доходов по источникам</h2>
+    <div class="subtitle">Диверсификация от 75% госфинансирования к 30%</div>
+    <div id="revenue" class="chart-box"></div>
+    <p class="source">Источник: Глава 11, раздел 11.4</p>
+  </div>
+</main>
+<footer>VR-экосистема СПб &bull; Глава 11. Финансовые модели &bull; 2026</footer>
+
+<script>
+const years = ['2026','2027','2028','2029','2030'];
+const C = {accent:'#6366f1',green:'#22c55e',amber:'#f59e0b',red:'#ef4444',cyan:'#06b6d4',pink:'#ec4899'};
+
+// --- Chart 1: Three Scenarios ---
+const ch1 = echarts.init(document.getElementById('scenarios'),'dark');
+ch1.setOption({
+  backgroundColor:'#1a1a2e',
+  tooltip:{trigger:'axis',formatter:function(p){let s=p[0].axisValue+'<br>';p.forEach(i=>{s+=i.marker+i.seriesName+': <b>'+i.value+' млн ₽</b><br>'});return s}},
+  legend:{top:5,textStyle:{color:'#ccc'}},
+  toolbox:{right:10,feature:{saveAsImage:{title:'Сохранить PNG'}}},
+  grid:{left:60,right:30,bottom:40,top:60},
+  xAxis:{type:'category',data:years,axisLabel:{color:'#aaa'}},
+  yAxis:{type:'value',name:'млн ₽',nameTextStyle:{color:'#aaa'},axisLabel:{color:'#aaa'},splitLine:{lineStyle:{color:'#333'}}},
+  series:[
+    {name:'Консерв. доходы',type:'line',data:[9,10.5,12,12.5,13],lineStyle:{type:'dashed',color:C.red},itemStyle:{color:C.red},symbol:'circle',symbolSize:6},
+    {name:'Консерв. расходы',type:'line',data:[13.5,14,14.5,15,15.5],lineStyle:{type:'dashed',color:C.red,opacity:.4},itemStyle:{color:C.red,opacity:.4},symbol:'diamond',symbolSize:6},
+    {name:'Базовый доходы',type:'line',data:[12,17,23,28,33],lineStyle:{color:C.green,width:3},itemStyle:{color:C.green},symbol:'circle',symbolSize:8},
+    {name:'Базовый расходы',type:'line',data:[13.5,15.5,17.5,19,20.5],lineStyle:{color:C.green,width:2,opacity:.5},itemStyle:{color:C.green,opacity:.5},symbol:'diamond',symbolSize:6},
+    {name:'Оптимист. доходы',type:'line',data:[12,20,30,40,50],lineStyle:{color:C.accent,width:3},itemStyle:{color:C.accent},symbol:'circle',symbolSize:8},
+    {name:'Оптимист. расходы',type:'line',data:[13.5,17,22,28,32],lineStyle:{color:C.accent,width:2,opacity:.5},itemStyle:{color:C.accent,opacity:.5},symbol:'diamond',symbolSize:6}
+  ]
+});
+
+// --- Chart 2: Cumulative balance ---
+const ch2 = echarts.init(document.getElementById('cumulative'),'dark');
+const cumBase = [-1.5, 0, 5.5, 14.5, 27];
+const cumOpt  = [-1.5, 1.5, 9.5, 21.5, 39.5];
+const cumCons = [-4.5, -8, -10.5, -13, -15.5];
+ch2.setOption({
+  backgroundColor:'#1a1a2e',
+  tooltip:{trigger:'axis',formatter:function(p){let s=p[0].axisValue+'<br>';p.forEach(i=>{s+=i.marker+i.seriesName+': <b>'+i.value+' млн ₽</b><br>'});return s}},
+  legend:{top:5,textStyle:{color:'#ccc'}},
+  toolbox:{right:10,feature:{saveAsImage:{title:'PNG'}}},
+  grid:{left:60,right:30,bottom:40,top:60},
+  xAxis:{type:'category',data:years,axisLabel:{color:'#aaa'}},
+  yAxis:{type:'value',name:'млн ₽ (накоплено)',nameTextStyle:{color:'#aaa'},axisLabel:{color:'#aaa'},splitLine:{lineStyle:{color:'#333'}}},
+  visualMap:{show:false,pieces:[{lt:0,color:C.red},{gte:0,color:C.green}],seriesIndex:1},
+  series:[
+    {name:'Консервативный',type:'line',data:cumCons,lineStyle:{type:'dashed',color:C.red},itemStyle:{color:C.red},symbol:'circle',symbolSize:6,areaStyle:{color:{type:'linear',x:0,y:0,x2:0,y2:1,colorStops:[{offset:0,color:'rgba(239,68,68,0.15)'},{offset:1,color:'rgba(239,68,68,0)'}]}}},
+    {name:'Базовый',type:'line',data:cumBase,lineStyle:{color:C.green,width:3},itemStyle:{color:C.green},symbol:'circle',symbolSize:8,
+     areaStyle:{color:{type:'linear',x:0,y:0,x2:0,y2:1,colorStops:[{offset:0,color:'rgba(34,197,94,0.2)'},{offset:1,color:'rgba(34,197,94,0)'}]}},
+     markLine:{data:[{yAxis:0,lineStyle:{color:'#fff',type:'dashed',width:1},label:{formatter:'Безубыточность',color:'#fff',fontSize:11}}]}
+    },
+    {name:'Оптимистичный',type:'line',data:cumOpt,lineStyle:{color:C.accent,width:3},itemStyle:{color:C.accent},symbol:'circle',symbolSize:8,areaStyle:{color:{type:'linear',x:0,y:0,x2:0,y2:1,colorStops:[{offset:0,color:'rgba(99,102,241,0.2)'},{offset:1,color:'rgba(99,102,241,0)'}]}}}
+  ]
+});
+
+// --- Chart 3: Revenue by source stacked ---
+const ch3 = echarts.init(document.getElementById('revenue'),'dark');
+ch3.setOption({
+  backgroundColor:'#1a1a2e',
+  tooltip:{trigger:'axis',axisPointer:{type:'shadow'}},
+  legend:{top:5,textStyle:{color:'#ccc'}},
+  toolbox:{right:10,feature:{saveAsImage:{title:'PNG'},magicType:{type:['stack','tiled'],title:{stack:'Стек',tiled:'Раздельно'}}}},
+  grid:{left:60,right:30,bottom:40,top:60},
+  xAxis:{type:'category',data:years,axisLabel:{color:'#aaa'}},
+  yAxis:{type:'value',name:'млн ₽',nameTextStyle:{color:'#aaa'},axisLabel:{color:'#aaa'},splitLine:{lineStyle:{color:'#333'}}},
+  series:[
+    {name:'B2G (государство)',type:'bar',stack:'total',data:[9,12,14,15,15],itemStyle:{color:C.accent},emphasis:{focus:'series'}},
+    {name:'B2B (бизнес)',type:'bar',stack:'total',data:[2,5,8,11,14],itemStyle:{color:C.green},emphasis:{focus:'series'}},
+    {name:'B2C (зрители)',type:'bar',stack:'total',data:[1,2.5,4,5.5,6.8],itemStyle:{color:C.cyan},emphasis:{focus:'series'}},
+    {name:'Международные',type:'bar',stack:'total',data:[0,0.5,1.5,3,5],itemStyle:{color:C.pink},emphasis:{focus:'series'}}
+  ]
+});
+
+window.addEventListener('resize',()=>{ch1.resize();ch2.resize();ch3.resize()});
+</script>
+</body>
+</html>

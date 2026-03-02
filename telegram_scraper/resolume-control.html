@@ -1,0 +1,370 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Resolume Web Control</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card: #111827;
+      --card-2: #1f2937;
+      --text: #e5e7eb;
+      --muted: #9ca3af;
+      --ok: #10b981;
+      --warn: #f59e0b;
+      --bad: #ef4444;
+      --accent: #22d3ee;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: "SF Mono", "Menlo", "Consolas", monospace;
+      color: var(--text);
+      background:
+        radial-gradient(1200px 600px at 10% -10%, #0b3a53 0%, rgba(11, 58, 83, 0) 60%),
+        radial-gradient(900px 500px at 100% 0%, #3f2c18 0%, rgba(63, 44, 24, 0) 60%),
+        var(--bg);
+      min-height: 100vh;
+      padding: 24px;
+    }
+
+    .wrap {
+      max-width: 980px;
+      margin: 0 auto;
+      display: grid;
+      gap: 16px;
+    }
+
+    .card {
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.01));
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 14px;
+      padding: 16px;
+      backdrop-filter: blur(6px);
+    }
+
+    h1, h2 {
+      margin: 0 0 10px 0;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+    }
+
+    h1 { font-size: 20px; }
+    h2 { font-size: 16px; color: var(--accent); }
+
+    .grid {
+      display: grid;
+      gap: 10px;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    }
+
+    label {
+      display: block;
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+
+    input, select, button {
+      width: 100%;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      background: var(--card);
+      color: var(--text);
+      border-radius: 8px;
+      padding: 10px;
+      font: inherit;
+      outline: none;
+    }
+
+    input:focus, select:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 2px rgba(34, 211, 238, 0.2);
+    }
+
+    button {
+      cursor: pointer;
+      background: linear-gradient(180deg, #155e75, #0e7490);
+      transition: transform .08s ease, filter .2s ease;
+    }
+
+    button:hover { filter: brightness(1.08); }
+    button:active { transform: translateY(1px) scale(.997); }
+
+    .status {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.06);
+    }
+
+    .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--warn);
+    }
+
+    .dot.ok { background: var(--ok); }
+    .dot.bad { background: var(--bad); }
+
+    .row {
+      display: grid;
+      gap: 10px;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      margin-bottom: 10px;
+    }
+
+    .actions {
+      display: grid;
+      gap: 10px;
+      grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+    }
+
+    #log {
+      white-space: pre-wrap;
+      font-size: 12px;
+      color: #d1d5db;
+      line-height: 1.4;
+      background: rgba(0, 0, 0, 0.2);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+      padding: 12px;
+      min-height: 120px;
+      max-height: 260px;
+      overflow: auto;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card">
+      <h1>Resolume Control Panel</h1>
+      <div class="row">
+        <div>
+          <label for="host">Host (без протокола)</label>
+          <input id="host" value="127.0.0.1" />
+        </div>
+        <div>
+          <label for="port">Port</label>
+          <input id="port" value="8080" />
+        </div>
+        <div>
+          <label for="apiBase">REST base path</label>
+          <input id="apiBase" value="/api/v1" />
+        </div>
+      </div>
+      <div class="actions">
+        <button id="connectWs">Connect WS</button>
+        <button id="disconnectWs">Disconnect WS</button>
+        <button id="pingRest">Ping REST</button>
+      </div>
+      <div style="margin-top: 10px">
+        <span class="status"><span id="wsDot" class="dot"></span><span id="wsText">WS: disconnected</span></span>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>1) Trigger clip (WebSocket)</h2>
+      <div class="row">
+        <div>
+          <label for="clipPath">Путь триггера (пример)</label>
+          <input id="clipPath" value="/composition/layers/1/clips/1/connect" />
+        </div>
+      </div>
+      <div class="actions">
+        <button id="triggerClip">Trigger Clip</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>2) Switch column (WebSocket)</h2>
+      <div class="row">
+        <div>
+          <label for="columnPath">Путь колонки (пример)</label>
+          <input id="columnPath" value="/composition/columns/1/connect" />
+        </div>
+      </div>
+      <div class="actions">
+        <button id="triggerColumn">Trigger Column</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>3) Opacity fade (REST)</h2>
+      <div class="grid">
+        <div>
+          <label for="opacityPath">Путь параметра opacity</label>
+          <input id="opacityPath" value="/composition/video/opacity" />
+        </div>
+        <div>
+          <label for="opacityFrom">From (0..1)</label>
+          <input id="opacityFrom" type="number" min="0" max="1" step="0.01" value="1" />
+        </div>
+        <div>
+          <label for="opacityTo">To (0..1)</label>
+          <input id="opacityTo" type="number" min="0" max="1" step="0.01" value="0" />
+        </div>
+        <div>
+          <label for="opacityMs">Duration ms</label>
+          <input id="opacityMs" type="number" min="50" step="50" value="1200" />
+        </div>
+      </div>
+      <div class="actions" style="margin-top: 10px">
+        <button id="fadeOpacity">Run Fade</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Debug log</h2>
+      <div id="log"></div>
+    </div>
+  </div>
+
+  <script>
+    const $ = (id) => document.getElementById(id);
+    let ws = null;
+
+    const log = (msg, data) => {
+      const now = new Date().toLocaleTimeString();
+      const line = `[${now}] ${msg}${data ? `\n${JSON.stringify(data, null, 2)}` : ""}`;
+      $("log").textContent = `${line}\n${$("log").textContent}`;
+    };
+
+    const host = () => $("host").value.trim();
+    const port = () => $("port").value.trim();
+    const apiBase = () => $("apiBase").value.trim().replace(/\/$/, "");
+
+    const wsUrl = () => `ws://${host()}:${port()}${apiBase()}`;
+    const restUrl = (path) => `http://${host()}:${port()}${apiBase()}${path}`;
+
+    const setWsState = (state, text) => {
+      const dot = $("wsDot");
+      dot.classList.remove("ok", "bad");
+      if (state === "ok") dot.classList.add("ok");
+      if (state === "bad") dot.classList.add("bad");
+      $("wsText").textContent = text;
+    };
+
+    const connectWs = () => {
+      if (ws && ws.readyState === WebSocket.OPEN) {
+        log("WS already connected");
+        return;
+      }
+      ws = new WebSocket(wsUrl());
+      setWsState("", "WS: connecting...");
+
+      ws.onopen = () => {
+        setWsState("ok", "WS: connected");
+        log("WS connected", { url: wsUrl() });
+      };
+
+      ws.onclose = () => {
+        setWsState("bad", "WS: disconnected");
+        log("WS disconnected");
+      };
+
+      ws.onerror = (e) => {
+        setWsState("bad", "WS: error");
+        log("WS error", e);
+      };
+
+      ws.onmessage = (event) => {
+        try {
+          log("WS message", JSON.parse(event.data));
+        } catch {
+          log("WS message", { raw: event.data });
+        }
+      };
+    };
+
+    const sendWsAction = (action, parameter, value) => {
+      if (!ws || ws.readyState !== WebSocket.OPEN) {
+        log("WS is not connected");
+        return;
+      }
+      const payload = { action, parameter };
+      if (value !== undefined) payload.value = value;
+      ws.send(JSON.stringify(payload));
+      log("WS sent", payload);
+    };
+
+    const restSet = async (parameter, value) => {
+      // Универсальный set через REST endpoint.
+      const url = restUrl("/command");
+      const body = { action: "set", parameter, value };
+      const res = await fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
+      const text = await res.text();
+      let payload = text;
+      try { payload = JSON.parse(text); } catch {}
+      log(`REST ${res.status} ${res.ok ? "OK" : "ERR"}`, payload);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    };
+
+    const pingRest = async () => {
+      try {
+        const res = await fetch(restUrl("/"));
+        const text = await res.text();
+        log(`REST ping ${res.status}`, text.slice(0, 250));
+      } catch (err) {
+        log("REST ping failed", { error: String(err) });
+      }
+    };
+
+    const fadeOpacity = async () => {
+      const path = $("opacityPath").value.trim();
+      const from = Number($("opacityFrom").value);
+      const to = Number($("opacityTo").value);
+      const duration = Number($("opacityMs").value);
+
+      if (!path || Number.isNaN(from) || Number.isNaN(to) || Number.isNaN(duration)) {
+        log("Fade: invalid values");
+        return;
+      }
+
+      const steps = Math.max(2, Math.round(duration / 50));
+      const dt = duration / (steps - 1);
+
+      try {
+        for (let i = 0; i < steps; i++) {
+          const t = i / (steps - 1);
+          const val = from + (to - from) * t;
+          await restSet(path, Number(val.toFixed(4)));
+          if (i < steps - 1) {
+            await new Promise((r) => setTimeout(r, dt));
+          }
+        }
+        log("Fade completed", { path, from, to, duration, steps });
+      } catch (err) {
+        log("Fade failed", { error: String(err) });
+      }
+    };
+
+    $("connectWs").addEventListener("click", connectWs);
+    $("disconnectWs").addEventListener("click", () => ws?.close());
+    $("pingRest").addEventListener("click", pingRest);
+
+    $("triggerClip").addEventListener("click", () => {
+      sendWsAction("trigger", $("clipPath").value.trim());
+    });
+
+    $("triggerColumn").addEventListener("click", () => {
+      sendWsAction("trigger", $("columnPath").value.trim());
+    });
+
+    $("fadeOpacity").addEventListener("click", fadeOpacity);
+
+    setWsState("bad", "WS: disconnected");
+    log("Ready. Проверьте пути параметров под ваш composition через API docs / inspector.");
+  </script>
+</body>
+</html>

@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Международные бенчмарки — VR-экосистема СПб</title>
+<script src="https://cdn.jsdelivr.net/npm/echarts@5.5.1/dist/echarts.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#0f0f23;--card:#1a1a2e;--text:#e0e0e0;--text2:#8888aa;--accent:#6366f1;--green:#22c55e;--amber:#f59e0b;--cyan:#06b6d4;--pink:#ec4899;--radius:12px}
+body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,-apple-system,sans-serif}
+nav{padding:15px 40px;border-bottom:1px solid #222}nav a{color:var(--accent);text-decoration:none;font-size:.85rem}
+header{padding:30px 40px 10px}header h1{font-size:1.6rem}header p{color:var(--text2);margin-top:6px;font-size:.9rem}
+main{padding:10px 40px 60px;display:grid;gap:24px;grid-template-columns:1fr 1fr}
+.chart-card{background:var(--card);border-radius:var(--radius);padding:24px;border:1px solid #222}
+.chart-card.full{grid-column:1/-1}
+.chart-card h2{font-size:1.1rem;margin-bottom:4px}.chart-card .subtitle{color:var(--text2);font-size:.8rem;margin-bottom:16px}
+.chart-box{width:100%;height:400px}
+.source{color:var(--text2);font-size:.75rem;margin-top:12px;font-style:italic}
+footer{text-align:center;padding:20px;color:var(--text2);font-size:.8rem;border-top:1px solid #222}
+@media(max-width:900px){main{grid-template-columns:1fr;padding:10px 15px}}
+</style>
+</head>
+<body>
+<nav><a href="index.html">← Все визуализации</a></nav>
+<header><h1>Международные бенчмарки</h1><p>ROI, окупаемость, цены VR-опыта по странам</p></header>
+<main>
+  <div class="chart-card full">
+    <h2>ROI международных VR-проектов в культуре</h2>
+    <div class="subtitle">Инвестиции vs годовой доход. Размер = срок окупаемости.</div>
+    <div id="roi" class="chart-box"></div>
+    <p class="source">Источник: Глава 11, табл. 11.7</p>
+  </div>
+  <div class="chart-card">
+    <h2>Стоимость VR-посещения по странам</h2>
+    <div id="pricing" class="chart-box"></div>
+    <p class="source">Источник: Глава 11, табл. 11.7</p>
+  </div>
+  <div class="chart-card">
+    <h2>Типичная траектория госфинансирования</h2>
+    <div class="subtitle">Снижение доли государства в успешных проектах</div>
+    <div id="gov_share" class="chart-box"></div>
+    <p class="source">Источник: Глава 11, раздел 11.7</p>
+  </div>
+</main>
+<footer>VR-экосистема СПб &bull; Глава 11. Бенчмарки &bull; 2026</footer>
+<script>
+const C={accent:'#6366f1',green:'#22c55e',amber:'#f59e0b',cyan:'#06b6d4',pink:'#ec4899'};
+
+// ROI scatter
+const c1=echarts.init(document.getElementById('roi'),'dark');
+const projects=[
+  {name:'Culturespaces',inv:30,rev:27.5,payback:3.5,country:'Франция'},
+  {name:'Horizon of Khufu',inv:5,rev:6.5,payback:1.7,country:'Междунар.'},
+  {name:'Arts Korea Lab',inv:38,rev:15,payback:4,country:'Юж. Корея'},
+  {name:'Museum of the Future',inv:136,rev:50,payback:7,country:'ОАЭ'},
+  {name:'Проект СПб (базовый)',inv:1.4,rev:0.45,payback:3,country:'Россия'}
+];
+c1.setOption({
+  backgroundColor:'#1a1a2e',
+  tooltip:{formatter:function(p){const d=projects[p.dataIndex];return '<b>'+d.name+'</b> ('+d.country+')<br>Инвестиции: $'+d.inv+'M<br>Годовой доход: ~$'+d.rev+'M<br>Окупаемость: ~'+d.payback+' лет'}},
+  toolbox:{right:10,feature:{saveAsImage:{title:'PNG'}}},
+  grid:{left:60,right:40,bottom:50,top:20},
+  xAxis:{type:'log',name:'Инвестиции ($M, лог.)',nameLocation:'center',nameGap:30,axisLabel:{color:'#aaa',formatter:'${value}M'},splitLine:{lineStyle:{color:'#333'}}},
+  yAxis:{type:'log',name:'Годовой доход ($M, лог.)',nameLocation:'center',nameGap:45,axisLabel:{color:'#aaa',formatter:'${value}M'},splitLine:{lineStyle:{color:'#333'}}},
+  series:[{type:'scatter',
+    data:projects.map(d=>[d.inv,d.rev]),
+    symbolSize:function(d,p){return projects[p.dataIndex].payback*8},
+    itemStyle:{color:function(p){return p.dataIndex===4?C.amber:C.accent},borderColor:'#fff',borderWidth:1},
+    label:{show:true,position:'top',formatter:function(p){return projects[p.dataIndex].name},color:'#ccc',fontSize:10}
+  }]
+});
+
+// Pricing by country
+const c2=echarts.init(document.getElementById('pricing'),'dark');
+c2.setOption({
+  backgroundColor:'#1a1a2e',
+  tooltip:{trigger:'axis',axisPointer:{type:'shadow'}},
+  grid:{left:100,right:30,bottom:30,top:10},
+  xAxis:{type:'value',name:'$ (среднее)',axisLabel:{color:'#aaa'},splitLine:{lineStyle:{color:'#333'}}},
+  yAxis:{type:'category',data:['Россия (СПб)','Япония','Юж. Корея','Франция','Великобритания','ОАЭ'],axisLabel:{color:'#ccc'}},
+  series:[{type:'bar',data:[2.5,15,14.5,14,16,31],
+    itemStyle:{color:function(p){return p.dataIndex===0?C.amber:C.accent}},
+    label:{show:true,position:'right',color:'#aaa',formatter:'${c}'}}]
+});
+
+// Gov share trajectory
+const c3=echarts.init(document.getElementById('gov_share'),'dark');
+c3.setOption({
+  backgroundColor:'#1a1a2e',
+  tooltip:{trigger:'axis'},
+  legend:{top:5,textStyle:{color:'#ccc'}},
+  grid:{left:50,right:30,bottom:40,top:50},
+  xAxis:{type:'category',data:['Год 1','Год 2','Год 3','Год 4','Год 5'],axisLabel:{color:'#aaa'}},
+  yAxis:{type:'value',max:100,name:'%',axisLabel:{color:'#aaa',formatter:'{value}%'},splitLine:{lineStyle:{color:'#333'}}},
+  series:[
+    {name:'Типичный мировой проект',type:'line',data:[80,65,50,35,25],lineStyle:{color:C.accent,type:'dashed'},itemStyle:{color:C.accent},symbol:'circle',symbolSize:6},
+    {name:'Проект СПб (базовый)',type:'line',data:[75,60,50,40,30],lineStyle:{color:C.amber,width:3},itemStyle:{color:C.amber},symbol:'circle',symbolSize:8,
+     areaStyle:{color:{type:'linear',x:0,y:0,x2:0,y2:1,colorStops:[{offset:0,color:'rgba(245,158,11,0.15)'},{offset:1,color:'transparent'}]}}}
+  ]
+});
+
+window.addEventListener('resize',()=>{[c1,c2,c3].forEach(c=>c.resize())});
+</script>
+</body>
+</html>

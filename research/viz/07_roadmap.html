@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Дорожная карта 2026-2030 — VR-экосистема СПб</title>
+<script src="https://cdn.jsdelivr.net/npm/echarts@5.5.1/dist/echarts.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#0f0f23;--card:#1a1a2e;--text:#e0e0e0;--text2:#8888aa;--accent:#6366f1;--green:#22c55e;--amber:#f59e0b;--red:#ef4444;--cyan:#06b6d4;--radius:12px}
+body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,-apple-system,sans-serif}
+nav{padding:15px 40px;border-bottom:1px solid #222}nav a{color:var(--accent);text-decoration:none;font-size:.85rem}
+header{padding:30px 40px 10px}header h1{font-size:1.6rem}header p{color:var(--text2);margin-top:6px;font-size:.9rem}
+main{padding:10px 40px 60px;display:grid;gap:24px}
+.chart-card{background:var(--card);border-radius:var(--radius);padding:24px;border:1px solid #222}
+.chart-card h2{font-size:1.1rem;margin-bottom:4px}.chart-card .subtitle{color:var(--text2);font-size:.8rem;margin-bottom:16px}
+.chart-box{width:100%;height:600px}
+.milestones{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;margin-top:16px}
+.ms{background:rgba(99,102,241,.06);border:1px solid #333;border-radius:10px;padding:16px;text-align:center}
+.ms .date{font-size:.8rem;color:var(--accent);font-weight:600}
+.ms .event{font-size:.9rem;margin-top:4px}
+.ms .metric{font-size:.75rem;color:var(--text2);margin-top:6px}
+.phases{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:16px}
+.phase{border-radius:10px;padding:16px;text-align:center}
+.phase h3{font-size:.95rem;margin-bottom:8px}
+.phase .stats{font-size:.8rem;color:var(--text2);line-height:1.7}
+.phase .stats b{color:var(--text)}
+.p0{background:rgba(99,102,241,.1);border:1px solid rgba(99,102,241,.3)}.p0 h3{color:var(--accent)}
+.p1{background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.3)}.p1 h3{color:var(--green)}
+.p2{background:rgba(6,182,212,.1);border:1px solid rgba(6,182,212,.3)}.p2 h3{color:var(--cyan)}
+.p3{background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.3)}.p3 h3{color:var(--amber)}
+.source{color:var(--text2);font-size:.75rem;margin-top:12px;font-style:italic}
+footer{text-align:center;padding:20px;color:var(--text2);font-size:.8rem;border-top:1px solid #222}
+@media(max-width:900px){.phases{grid-template-columns:1fr 1fr}.chart-box{height:500px}main{padding:10px 15px}}
+@media(max-width:600px){.phases{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<nav><a href="index.html">← Все визуализации</a></nav>
+<header>
+  <h1>Дорожная карта 2026-2030</h1>
+  <p>4 фазы реализации, ключевые вехи и Gate Reviews</p>
+</header>
+<main>
+  <div class="chart-card">
+    <h2>Обзор фаз</h2>
+    <div class="phases">
+      <div class="phase p0"><h3>Фаза 0</h3><div class="stats">Q1-Q2 2026<br><b>Подготовка</b><br>3 точки, 8 FTE<br>6 произведений<br>15-18 млн ₽</div></div>
+      <div class="phase p1"><h3>Фаза 1</h3><div class="stats">Q3-Q4 2026<br><b>Пилот</b><br>3 точки, 10K посет.<br>12 произведений<br>8-10 млн ₽</div></div>
+      <div class="phase p2"><h3>Фаза 2</h3><div class="stats">2027-2028<br><b>Масштабирование</b><br>5→10 точек<br>44 произведения<br>15-22 млн/год</div></div>
+      <div class="phase p3"><h3>Фаза 3</h3><div class="stats">2029-2030<br><b>Зрелость</b><br>10→22 точки<br>100+ произведений<br>20-32 млн/год</div></div>
+    </div>
+  </div>
+
+  <div class="chart-card">
+    <h2>Диаграмма Ганта</h2>
+    <div class="subtitle">Задачи по фазам. Наведите для деталей.</div>
+    <div id="gantt" class="chart-box"></div>
+    <p class="source">Источник: Глава 13, раздел 13.8</p>
+  </div>
+
+  <div class="chart-card">
+    <h2>Ключевые вехи</h2>
+    <div class="milestones">
+      <div class="ms"><div class="date">Q1 2026</div><div class="event">Утверждение проекта</div><div class="metric">Точка невозврата</div></div>
+      <div class="ms"><div class="date">Июнь 2026</div><div class="event">Gate Review 0</div><div class="metric">Решение о запуске</div></div>
+      <div class="ms"><div class="date">Июль 2026</div><div class="event">Торжественное открытие</div><div class="metric">Год культуры</div></div>
+      <div class="ms"><div class="date">Дек. 2026</div><div class="event">Gate Review 1</div><div class="metric">Решение о масштабировании</div></div>
+      <div class="ms"><div class="date">Q2 2027</div><div class="event">Безубыточность</div><div class="metric">Доходы > расходов</div></div>
+      <div class="ms"><div class="date">Q4 2028</div><div class="event">100 000 посетителей</div><div class="metric">10 точек, Gate Review 2</div></div>
+      <div class="ms"><div class="date">Q4 2029</div><div class="event">10 регионов РФ</div><div class="metric">Федеральный охват</div></div>
+      <div class="ms"><div class="date">Q4 2030</div><div class="event">500 000 посетителей</div><div class="metric">22 точки, Gate Review 3</div></div>
+    </div>
+    <p class="source">Источник: Глава 13, раздел 13.14</p>
+  </div>
+</main>
+<footer>VR-экосистема СПб &bull; Глава 13. Дорожная карта &bull; 2026</footer>
+<script>
+const colors = {p0:'#6366f1',p1:'#22c55e',p2:'#06b6d4',p3:'#f59e0b'};
+const tasks = [
+  {name:'Формирование команды',phase:'p0',start:0,dur:2},
+  {name:'Закупка оборудования',phase:'p0',start:0,dur:2},
+  {name:'Ремонт VR-зон',phase:'p0',start:0,dur:3},
+  {name:'Разработка платформы',phase:'p0',start:0,dur:3},
+  {name:'Создание контента (6 шт.)',phase:'p0',start:0,dur:3},
+  {name:'Юридическая база',phase:'p0',start:0,dur:2},
+  {name:'Gate Review 0',phase:'p0',start:2,dur:0.2},
+  {name:'Публичные показы (3 точки)',phase:'p1',start:3,dur:3},
+  {name:'Школьная программа',phase:'p1',start:3,dur:3},
+  {name:'B2B-продажи',phase:'p1',start:3,dur:3},
+  {name:'WebXR бета',phase:'p1',start:4,dur:2},
+  {name:'Новый контент (6 шт.)',phase:'p1',start:3,dur:3},
+  {name:'Gate Review 1',phase:'p1',start:6,dur:0.2},
+  {name:'Открытие точек 4-10',phase:'p2',start:6,dur:12},
+  {name:'Наём (12→18 FTE)',phase:'p2',start:6,dur:6},
+  {name:'Корпоративная программа',phase:'p2',start:6,dur:12},
+  {name:'Региональное лицензирование',phase:'p2',start:9,dur:9},
+  {name:'Контент 12-20/год',phase:'p2',start:6,dur:12},
+  {name:'Международные фестивали',phase:'p2',start:9,dur:3},
+  {name:'Обновление шлемов Gen 2',phase:'p2',start:15,dur:3},
+  {name:'Gate Review 2',phase:'p2',start:18,dur:0.2},
+  {name:'Расширение до 22 точек',phase:'p3',start:18,dur:12},
+  {name:'Тиражирование (10 регионов)',phase:'p3',start:18,dur:12},
+  {name:'Центр компетенций',phase:'p3',start:18,dur:6},
+  {name:'AR-направление',phase:'p3',start:21,dur:9},
+  {name:'Экспорт контента',phase:'p3',start:18,dur:12},
+  {name:'Стратегия 2031-2035',phase:'p3',start:27,dur:3},
+  {name:'Gate Review 3',phase:'p3',start:30,dur:0.2}
+];
+const quarters = ['Q1\'26','Q2\'26','Q3\'26','Q4\'26','Q1\'27','Q2\'27','Q3\'27','Q4\'27','Q1\'28','Q2\'28','Q3\'28','Q4\'28','Q1\'29','Q2\'29','Q3\'29','Q4\'29','Q1\'30','Q2\'30','Q3\'30','Q4\'30'];
+
+const categories = tasks.map(t=>t.name).reverse();
+const data = tasks.map((t,i)=>({
+  value:[tasks.length-1-i, t.start, t.start+t.dur],
+  itemStyle:{color:colors[t.phase],opacity:t.name.includes('Gate')?1:.7,borderRadius:t.name.includes('Gate')?0:4},
+  name:t.name,phase:t.phase
+}));
+
+const ch=echarts.init(document.getElementById('gantt'),'dark');
+ch.setOption({
+  backgroundColor:'#1a1a2e',
+  tooltip:{formatter:function(p){
+    const d=p.data;const qs=Math.floor(d.value[1]);const qe=Math.floor(d.value[2]);
+    return '<b>'+d.name+'</b><br>'+
+      (quarters[qs]||'')+(qe!==qs?' → '+(quarters[Math.min(qe,19)]||''):'');
+  }},
+  toolbox:{right:10,feature:{saveAsImage:{title:'PNG'}}},
+  grid:{left:220,right:30,bottom:40,top:20},
+  xAxis:{type:'value',min:0,max:20,interval:1,
+    axisLabel:{color:'#aaa',formatter:function(v){return quarters[v]||''},rotate:45,fontSize:10},
+    splitLine:{lineStyle:{color:'#222'}}},
+  yAxis:{type:'category',data:categories,axisLabel:{color:'#ccc',fontSize:10},axisTick:{show:false}},
+  series:[{
+    type:'custom',
+    renderItem:function(params,api){
+      const catIdx=api.value(0);
+      const start=api.coord([api.value(1),catIdx]);
+      const end=api.coord([api.value(2),catIdx]);
+      const height=api.size([0,1])[1]*0.6;
+      return{type:'rect',shape:{x:start[0],y:start[1]-height/2,width:Math.max(end[0]-start[0],4),height:height},
+        style:api.style(),styleEmphasis:api.styleEmphasis()};
+    },
+    encode:{x:[1,2],y:0},
+    data:data
+  }]
+});
+window.addEventListener('resize',()=>{ch.resize()});
+</script>
+</body>
+</html>

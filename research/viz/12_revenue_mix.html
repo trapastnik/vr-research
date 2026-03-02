@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Диверсификация доходов — VR-экосистема СПб</title>
+<script src="https://cdn.jsdelivr.net/npm/echarts@5.5.1/dist/echarts.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#0f0f23;--card:#1a1a2e;--text:#e0e0e0;--text2:#8888aa;--accent:#6366f1;--green:#22c55e;--amber:#f59e0b;--red:#ef4444;--cyan:#06b6d4;--pink:#ec4899;--radius:12px}
+body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,-apple-system,sans-serif}
+nav{padding:15px 40px;border-bottom:1px solid #222}nav a{color:var(--accent);text-decoration:none;font-size:.85rem}
+header{padding:30px 40px 10px}header h1{font-size:1.6rem}header p{color:var(--text2);margin-top:6px;font-size:.9rem}
+main{padding:10px 40px 60px;display:grid;gap:24px;grid-template-columns:1fr 1fr}
+.chart-card{background:var(--card);border-radius:var(--radius);padding:24px;border:1px solid #222}
+.chart-card.full{grid-column:1/-1}
+.chart-card h2{font-size:1.1rem;margin-bottom:4px}.chart-card .subtitle{color:var(--text2);font-size:.8rem;margin-bottom:16px}
+.chart-box{width:100%;height:450px}
+.source{color:var(--text2);font-size:.75rem;margin-top:12px;font-style:italic}
+footer{text-align:center;padding:20px;color:var(--text2);font-size:.8rem;border-top:1px solid #222}
+@media(max-width:900px){main{grid-template-columns:1fr;padding:10px 15px}}
+</style>
+</head>
+<body>
+<nav><a href="index.html">← Все визуализации</a></nav>
+<header><h1>Диверсификация доходов</h1><p>Трансформация от 75% госфинансирования к 30% за 5 лет</p></header>
+<main>
+  <div class="chart-card full">
+    <h2>Доли источников дохода (100% stacked)</h2>
+    <div class="subtitle">Снижение зависимости от государственных субсидий</div>
+    <div id="stacked100" class="chart-box"></div>
+    <p class="source">Источник: Глава 11, 13</p>
+  </div>
+  <div class="chart-card">
+    <h2>2026: Структура доходов</h2>
+    <div id="pie2026" class="chart-box"></div>
+  </div>
+  <div class="chart-card">
+    <h2>2030: Структура доходов</h2>
+    <div id="pie2030" class="chart-box"></div>
+  </div>
+</main>
+<footer>VR-экосистема СПб &bull; Диверсификация доходов &bull; 2026</footer>
+<script>
+const Y=['2026','2027','2028','2029','2030'];
+const C={accent:'#6366f1',green:'#22c55e',amber:'#f59e0b',cyan:'#06b6d4',pink:'#ec4899',purple:'#8b5cf6'};
+const b2g=[9,12,14,14,12],grants=[6,3,4,3,2],b2b=[2,5,8,12,16],b2c=[1,2.5,4,6,8],intl=[0,0.5,1.5,3,5];
+// Compute percentages
+const totals=Y.map((_,i)=>b2g[i]+grants[i]+b2b[i]+b2c[i]+intl[i]);
+const pct=(arr)=>arr.map((v,i)=>+(v/totals[i]*100).toFixed(1));
+
+const c1=echarts.init(document.getElementById('stacked100'),'dark');
+c1.setOption({
+  backgroundColor:'#1a1a2e',
+  tooltip:{trigger:'axis',formatter:function(p){let s=p[0].axisValue+'<br>';p.forEach(i=>{s+=i.marker+i.seriesName+': <b>'+i.value+'%</b><br>'});return s}},
+  legend:{top:5,textStyle:{color:'#ccc'}},
+  toolbox:{right:10,feature:{saveAsImage:{title:'PNG'}}},
+  grid:{left:50,right:30,bottom:40,top:60},
+  xAxis:{type:'category',data:Y,axisLabel:{color:'#aaa'}},
+  yAxis:{type:'value',max:100,name:'%',axisLabel:{color:'#aaa',formatter:'{value}%'},splitLine:{lineStyle:{color:'#333'}}},
+  series:[
+    {name:'B2G (государство)',type:'bar',stack:'t',data:pct(b2g),itemStyle:{color:C.accent}},
+    {name:'Гранты',type:'bar',stack:'t',data:pct(grants),itemStyle:{color:C.purple}},
+    {name:'B2B (бизнес)',type:'bar',stack:'t',data:pct(b2b),itemStyle:{color:C.green}},
+    {name:'B2C (зрители)',type:'bar',stack:'t',data:pct(b2c),itemStyle:{color:C.cyan}},
+    {name:'Международные',type:'bar',stack:'t',data:pct(intl),itemStyle:{color:C.pink}}
+  ]
+});
+
+function makePie(elId,data){
+  const c=echarts.init(document.getElementById(elId),'dark');
+  c.setOption({
+    backgroundColor:'#1a1a2e',
+    tooltip:{trigger:'item',formatter:'{b}: {c} млн ₽ ({d}%)'},
+    series:[{type:'pie',radius:['35%','65%'],center:['50%','55%'],label:{color:'#ccc',fontSize:11},
+      data:data,emphasis:{itemStyle:{shadowBlur:10,shadowColor:'rgba(0,0,0,.5)'}}}]
+  });
+  window.addEventListener('resize',()=>c.resize());
+}
+makePie('pie2026',[
+  {value:9,name:'B2G',itemStyle:{color:C.accent}},
+  {value:6,name:'Гранты',itemStyle:{color:C.purple}},
+  {value:2,name:'B2B',itemStyle:{color:C.green}},
+  {value:1,name:'B2C',itemStyle:{color:C.cyan}}
+]);
+makePie('pie2030',[
+  {value:12,name:'B2G',itemStyle:{color:C.accent}},
+  {value:2,name:'Гранты',itemStyle:{color:C.purple}},
+  {value:16,name:'B2B',itemStyle:{color:C.green}},
+  {value:8,name:'B2C',itemStyle:{color:C.cyan}},
+  {value:5,name:'Международные',itemStyle:{color:C.pink}}
+]);
+window.addEventListener('resize',()=>c1.resize());
+</script>
+</body>
+</html>

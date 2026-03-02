@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VR-экосистема СПб — Интерактивные визуализации</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#0f0f23;--card:#1a1a2e;--card-hover:#252547;--text:#e0e0e0;--text2:#8888aa;--accent:#6366f1;--green:#22c55e;--amber:#f59e0b;--red:#ef4444;--cyan:#06b6d4;--pink:#ec4899;--radius:12px}
+body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,-apple-system,sans-serif;min-height:100vh}
+.hero{text-align:center;padding:60px 20px 30px}
+.hero h1{font-size:2rem;font-weight:700;background:linear-gradient(135deg,var(--accent),var(--cyan));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero p{color:var(--text2);margin-top:10px;font-size:1rem;max-width:700px;margin-inline:auto}
+.metrics{display:flex;justify-content:center;gap:30px;flex-wrap:wrap;padding:20px;margin-bottom:20px}
+.metric{text-align:center}
+.metric .val{font-size:2rem;font-weight:700;color:var(--accent)}
+.metric .label{font-size:.8rem;color:var(--text2);margin-top:2px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:20px;padding:20px 40px 60px;max-width:1400px;margin:auto}
+.card{background:var(--card);border-radius:var(--radius);padding:24px;text-decoration:none;color:var(--text);transition:all .2s;border:1px solid transparent;display:flex;flex-direction:column;gap:10px}
+.card:hover{background:var(--card-hover);border-color:var(--accent);transform:translateY(-2px);box-shadow:0 8px 30px rgba(99,102,241,.15)}
+.card .icon{font-size:2rem;width:48px;height:48px;display:flex;align-items:center;justify-content:center;border-radius:10px}
+.card h2{font-size:1.1rem;font-weight:600}
+.card p{font-size:.85rem;color:var(--text2);line-height:1.5}
+.card .tag{font-size:.7rem;padding:3px 8px;border-radius:20px;display:inline-block;width:fit-content}
+.tag-finance{background:rgba(34,197,94,.15);color:var(--green)}
+.tag-market{background:rgba(99,102,241,.15);color:var(--accent)}
+.tag-tech{background:rgba(6,182,212,.15);color:var(--cyan)}
+.tag-strategy{background:rgba(245,158,11,.15);color:var(--amber)}
+.tag-risk{background:rgba(239,68,68,.15);color:var(--red)}
+.tag-team{background:rgba(236,72,153,.15);color:var(--pink)}
+footer{text-align:center;padding:20px;color:var(--text2);font-size:.8rem;border-top:1px solid #222}
+@media(max-width:600px){.hero h1{font-size:1.4rem}.grid{padding:15px}.metrics{gap:15px}.metric .val{font-size:1.4rem}}
+</style>
+</head>
+<body>
+<div class="hero">
+  <h1>VR-экосистема культурного наследия Санкт-Петербурга</h1>
+  <p>Интерактивные визуализации исследования рынка &bull; 14 глав &bull; Февраль 2026</p>
+</div>
+<div class="metrics">
+  <div class="metric"><div class="val">129 млн</div><div class="label">Бюджет 5 лет, руб.</div></div>
+  <div class="metric"><div class="val">22</div><div class="label">Точки показа к 2030</div></div>
+  <div class="metric"><div class="val">500K</div><div class="label">Посетителей к 2030</div></div>
+  <div class="metric"><div class="val">100+</div><div class="label">VR-произведений</div></div>
+</div>
+<div class="grid">
+  <a class="card" href="01_market_global.html">
+    <div class="icon" style="background:rgba(99,102,241,.15)">🌍</div>
+    <span class="tag tag-market">Рынок</span>
+    <h2>Глобальный рынок VR/AR</h2>
+    <p>$41-75 млрд (2024), рост до $150+ млрд к 2030. Сегментация по технологиям, регионам и отраслям.</p>
+  </a>
+  <a class="card" href="02_market_russia.html">
+    <div class="icon" style="background:rgba(99,102,241,.15)">🇷🇺</div>
+    <span class="tag tag-market">Рынок</span>
+    <h2>Российский рынок VR/AR</h2>
+    <p>~5 млрд руб. (2024), CAGR 31-40%. Санкции, параллельный импорт, Пушкинская карта.</p>
+  </a>
+  <a class="card" href="03_financial_model.html">
+    <div class="icon" style="background:rgba(34,197,94,.15)">💰</div>
+    <span class="tag tag-finance">Финансы</span>
+    <h2>Финансовая модель: 3 сценария</h2>
+    <p>Консервативный / Базовый / Оптимистичный. Безубыточность в 2027, прибыль 25+ млн к 2030.</p>
+  </a>
+  <a class="card" href="04_budget.html">
+    <div class="icon" style="background:rgba(34,197,94,.15)">📊</div>
+    <span class="tag tag-finance">Финансы</span>
+    <h2>Бюджет по фазам</h2>
+    <p>CAPEX + OPEX: 129 млн за 5 лет. Распределение по статьям и источникам финансирования.</p>
+  </a>
+  <a class="card" href="05_risk_matrix.html">
+    <div class="icon" style="background:rgba(239,68,68,.15)">⚠️</div>
+    <span class="tag tag-risk">Риски</span>
+    <h2>Матрица рисков + SWOT</h2>
+    <p>18 рисков на матрице Вероятность × Влияние. SWOT-анализ: 7S, 5W, 7O, 5T.</p>
+  </a>
+  <a class="card" href="06_technology.html">
+    <div class="icon" style="background:rgba(6,182,212,.15)">🥽</div>
+    <span class="tag tag-tech">Технологии</span>
+    <h2>Сравнение VR-шлемов</h2>
+    <p>10 моделей: Pico, DPVR, Meta, Apple. Радар-диаграмма + интерактивная таблица.</p>
+  </a>
+  <a class="card" href="07_roadmap.html">
+    <div class="icon" style="background:rgba(245,158,11,.15)">🗺️</div>
+    <span class="tag tag-strategy">Стратегия</span>
+    <h2>Дорожная карта 2026-2030</h2>
+    <p>4 фазы, диаграмма Ганта, ключевые вехи и Gate Reviews.</p>
+  </a>
+  <a class="card" href="08_team_growth.html">
+    <div class="icon" style="background:rgba(236,72,153,.15)">👥</div>
+    <span class="tag tag-team">Команда</span>
+    <h2>Рост команды</h2>
+    <p>8 → 30 FTE за 5 лет. Организационная структура, роли, компетенции.</p>
+  </a>
+  <a class="card" href="09_content_costs.html">
+    <div class="icon" style="background:rgba(6,182,212,.15)">🎬</div>
+    <span class="tag tag-tech">Контент</span>
+    <h2>Стоимость VR-контента</h2>
+    <p>8 типов контента: от 50K (360° видео) до 5M руб. (VR-фильм). Время, команда, оборудование.</p>
+  </a>
+  <a class="card" href="10_benchmarks.html">
+    <div class="icon" style="background:rgba(245,158,11,.15)">🏆</div>
+    <span class="tag tag-strategy">Бенчмарки</span>
+    <h2>Международные бенчмарки</h2>
+    <p>Culturespaces (ROI 85%), Arts Korea Lab ($38M), Museum of the Future. Цены по странам.</p>
+  </a>
+  <a class="card" href="11_kpi_dashboard.html">
+    <div class="icon" style="background:rgba(245,158,11,.15)">📈</div>
+    <span class="tag tag-strategy">KPI</span>
+    <h2>KPI Dashboard</h2>
+    <p>12 метрик 2026-2030: посетители, NPS, контракты, доходы, стоимость посещения.</p>
+  </a>
+  <a class="card" href="12_revenue_mix.html">
+    <div class="icon" style="background:rgba(34,197,94,.15)">🔄</div>
+    <span class="tag tag-finance">Финансы</span>
+    <h2>Диверсификация доходов</h2>
+    <p>От 75% госфинансирования к 30%: трансформация модели доходов B2G → B2B → B2C.</p>
+  </a>
+</div>
+<footer>VR-экосистема культурного наследия Санкт-Петербурга &bull; Исследование рынка &bull; Claude+DVN, 2026</footer>
+</body>
+</html>

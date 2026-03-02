@@ -1,0 +1,87 @@
+site_name: "VR-экосистема культурного наследия Санкт-Петербурга"
+site_url: "http://212.113.117.186/vr/"
+site_description: "Исследование рынка VR для создания культурной экосистемы. 13 глав, 170+ источников, 15+ стран, 50+ кейсов."
+site_author: "Библиотека им. В.В. Маяковского"
+
+theme:
+  name: material
+  language: ru
+  palette:
+    - scheme: slate
+      primary: indigo
+      accent: cyan
+      toggle:
+        icon: material/brightness-7
+        name: Светлая тема
+    - scheme: default
+      primary: indigo
+      accent: cyan
+      toggle:
+        icon: material/brightness-4
+        name: Тёмная тема
+  features:
+    - navigation.tabs
+    - navigation.tabs.sticky
+    - navigation.sections
+    - navigation.expand
+    - navigation.top
+    - navigation.indexes
+    - search.suggest
+    - search.highlight
+    - search.share
+    - content.tabs.link
+    - toc.follow
+  font:
+    text: Inter
+    code: JetBrains Mono
+  icon:
+    logo: material/virtual-reality
+
+nav:
+  - Резюме: index.md
+  - Рынок:
+    - "Гл.1. Глобальный рынок VR/AR": 01-global-market.md
+    - "Гл.2. Российский рынок VR/AR": 02-russian-market.md
+  - Мировой опыт:
+    - "Гл.3. VR в культуре": 03-culture-world.md
+    - "Гл.4. Государственные экосистемы": 04-government-ecosystems.md
+  - Технологии:
+    - "Гл.5. Технологический стек": 05-tech-stack.md
+    - "Гл.6. AI и генеративные технологии": 06-ai-generative.md
+    - "Гл.7. Платформы дистрибуции": 07-distribution.md
+  - Социальные аспекты:
+    - "Гл.8. Доступность и инклюзия": 08-accessibility.md
+    - "Гл.9. Кадры и компетенции": 09-workforce.md
+  - Реализация:
+    - "Гл.10. Правовое регулирование": 10-legal.md
+    - "Гл.11. Финансовые модели": 11-financial-models.md
+    - "Гл.12. Риски и рекомендации": 12-risks.md
+    - "Гл.13. Дорожная карта": 13-roadmap.md
+  - "📊 Мониторинг Telegram": monitoring.md
+
+plugins:
+  - search:
+      lang: ru
+      separator: '[\s\-\.]+'
+  - minify:
+      minify_html: true
+
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.mark
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - tables
+  - attr_list
+  - md_in_html
+  - toc:
+      permalink: true
+      toc_depth: 3
+
+extra_css:
+  - assets/stylesheets/extra.css

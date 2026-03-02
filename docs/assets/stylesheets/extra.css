@@ -1,0 +1,62 @@
+/* VR Research Wiki — Custom Styles */
+
+/* Iframe containers for visualizations */
+.viz-container {
+  margin: 1.5rem 0;
+  overflow: hidden;
+  border-radius: 12px;
+}
+
+.viz-container iframe {
+  width: 100%;
+  min-height: 600px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  background: #0f0f23;
+}
+
+/* Light theme adjustments */
+[data-md-color-scheme="default"] .viz-container iframe {
+  border-color: rgba(0, 0, 0, 0.12);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Responsive iframe sizing */
+@media (max-width: 768px) {
+  .viz-container iframe {
+    min-height: 400px;
+  }
+}
+
+/* Chapter navigation footer */
+.chapter-nav {
+  display: flex;
+  justify-content: space-between;
+  padding: 1rem 0;
+  margin-top: 2rem;
+  border-top: 1px solid var(--md-default-fg-color--lightest);
+  font-size: 0.9rem;
+}
+
+.chapter-nav a {
+  color: var(--md-accent-fg-color);
+  text-decoration: none;
+}
+
+.chapter-nav a:hover {
+  text-decoration: underline;
+}
+
+/* Wider content area for research text */
+.md-grid {
+  max-width: 1440px;
+}
+
+/* Improve table readability */
+.md-typeset table:not([class]) {
+  font-size: 0.82rem;
+}
+
+.md-typeset table:not([class]) th {
+  white-space: nowrap;
+}

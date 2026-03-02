@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Бюджет по фазам — VR-экосистема СПб</title>
+<script src="https://cdn.jsdelivr.net/npm/echarts@5.5.1/dist/echarts.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#0f0f23;--card:#1a1a2e;--text:#e0e0e0;--text2:#8888aa;--accent:#6366f1;--green:#22c55e;--amber:#f59e0b;--red:#ef4444;--cyan:#06b6d4;--radius:12px}
+body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,-apple-system,sans-serif}
+nav{padding:15px 40px;border-bottom:1px solid #222}nav a{color:var(--accent);text-decoration:none;font-size:.85rem}
+header{padding:30px 40px 10px}header h1{font-size:1.6rem}header p{color:var(--text2);margin-top:6px;font-size:.9rem}
+main{padding:10px 40px 60px;display:grid;gap:24px;grid-template-columns:1fr 1fr}
+.chart-card{background:var(--card);border-radius:var(--radius);padding:24px;border:1px solid #222}
+.chart-card.full{grid-column:1/-1}
+.chart-card h2{font-size:1.1rem;margin-bottom:4px}.chart-card .subtitle{color:var(--text2);font-size:.8rem;margin-bottom:16px}
+.chart-box{width:100%;height:450px}
+.source{color:var(--text2);font-size:.75rem;margin-top:12px;font-style:italic}
+footer{text-align:center;padding:20px;color:var(--text2);font-size:.8rem;border-top:1px solid #222}
+@media(max-width:900px){main{grid-template-columns:1fr;padding:10px 15px}.chart-box{height:350px}}
+</style>
+</head>
+<body>
+<nav><a href="index.html">← Все визуализации</a></nav>
+<header>
+  <h1>Бюджет по фазам</h1>
+  <p>CAPEX + OPEX: 129 млн руб. за 5 лет (2026-2030)</p>
+</header>
+<main>
+  <div class="chart-card full">
+    <h2>CAPEX и OPEX по годам</h2>
+    <div class="subtitle">Капитальные и операционные расходы</div>
+    <div id="capex_opex" class="chart-box"></div>
+    <p class="source">Источник: Глава 13, раздел 13.9</p>
+  </div>
+  <div class="chart-card">
+    <h2>Структура OPEX (2030)</h2>
+    <div class="subtitle">Крупнейший год — распределение операционных расходов</div>
+    <div id="opex_pie" class="chart-box"></div>
+    <p class="source">Источник: Глава 13, раздел 13.9</p>
+  </div>
+  <div class="chart-card">
+    <h2>Источники финансирования</h2>
+    <div class="subtitle">Эволюция от 100% госфинансирования к диверсификации</div>
+    <div id="sources" class="chart-box"></div>
+    <p class="source">Источник: Глава 13, раздел 13.9</p>
+  </div>
+</main>
+<footer>VR-экосистема СПб &bull; Бюджет &bull; 2026</footer>
+<script>
+const Y=['2026','2027','2028','2029','2030'];
+const C={accent:'#6366f1',green:'#22c55e',amber:'#f59e0b',red:'#ef4444',cyan:'#06b6d4',pink:'#ec4899',purple:'#8b5cf6'};
+
+// CAPEX+OPEX stacked
+const c1=echarts.init(document.getElementById('capex_opex'),'dark');
+c1.setOption({
+  backgroundColor:'#1a1a2e',
+  tooltip:{trigger:'axis',axisPointer:{type:'shadow'}},
+  legend:{top:5,textStyle:{color:'#ccc'}},
+  toolbox:{right:10,feature:{saveAsImage:{title:'PNG'}}},
+  grid:{left:60,right:30,bottom:40,top:60},
+  xAxis:{type:'category',data:Y,axisLabel:{color:'#aaa'}},
+  yAxis:{type:'value',name:'тыс. ₽',axisLabel:{color:'#aaa'},splitLine:{lineStyle:{color:'#333'}}},
+  series:[
+    {name:'Оборудование',type:'bar',stack:'all',data:[2700,1500,1800,2500,3000],itemStyle:{color:C.accent}},
+    {name:'Ремонт VR-зон',type:'bar',stack:'all',data:[2000,1000,1500,2000,2500],itemStyle:{color:C.purple}},
+    {name:'Серверы',type:'bar',stack:'all',data:[800,300,400,500,600],itemStyle:{color:C.cyan}},
+    {name:'Платформа',type:'bar',stack:'all',data:[4000,1000,800,500,500],itemStyle:{color:'#64748b'}},
+    {name:'Персонал',type:'bar',stack:'all',data:[5500,7200,9000,12000,15000],itemStyle:{color:C.green}},
+    {name:'Контент',type:'bar',stack:'all',data:[4000,5000,7000,8000,10000],itemStyle:{color:C.amber}},
+    {name:'Маркетинг',type:'bar',stack:'all',data:[700,1000,1200,1500,1500],itemStyle:{color:C.pink}},
+    {name:'Прочее',type:'bar',stack:'all',data:[1150,1600,2000,2500,2900],itemStyle:{color:'#475569'}}
+  ]
+});
+
+// OPEX pie 2030
+const c2=echarts.init(document.getElementById('opex_pie'),'dark');
+c2.setOption({
+  backgroundColor:'#1a1a2e',
+  tooltip:{trigger:'item',formatter:'{b}: {c} тыс. ₽ ({d}%)'},
+  toolbox:{right:10,feature:{saveAsImage:{title:'PNG'}}},
+  series:[{
+    type:'pie',radius:['40%','70%'],center:['50%','55%'],
+    label:{color:'#ccc',fontSize:11},
+    data:[
+      {value:15000,name:'Персонал',itemStyle:{color:C.green}},
+      {value:10000,name:'Контент',itemStyle:{color:C.amber}},
+      {value:1500,name:'Маркетинг',itemStyle:{color:C.pink}},
+      {value:1000,name:'Техобслуж.',itemStyle:{color:C.cyan}},
+      {value:700,name:'ПО/лицензии',itemStyle:{color:C.accent}},
+      {value:600,name:'Расходные',itemStyle:{color:C.purple}},
+      {value:600,name:'Прочее',itemStyle:{color:'#475569'}}
+    ],
+    emphasis:{itemStyle:{shadowBlur:10,shadowColor:'rgba(0,0,0,.5)'}}
+  }]
+});
+
+// Sources stacked area
+const c3=echarts.init(document.getElementById('sources'),'dark');
+c3.setOption({
+  backgroundColor:'#1a1a2e',
+  tooltip:{trigger:'axis'},
+  legend:{top:5,textStyle:{color:'#ccc'}},
+  toolbox:{right:10,feature:{saveAsImage:{title:'PNG'}}},
+  grid:{left:50,right:20,bottom:40,top:60},
+  xAxis:{type:'category',data:Y,boundaryGap:false,axisLabel:{color:'#aaa'}},
+  yAxis:{type:'value',name:'тыс. ₽',axisLabel:{color:'#aaa'},splitLine:{lineStyle:{color:'#333'}}},
+  series:[
+    {name:'B2G',type:'line',stack:'t',areaStyle:{},data:[9000,12000,14000,14000,12000],itemStyle:{color:C.accent}},
+    {name:'Гранты',type:'line',stack:'t',areaStyle:{},data:[6000,3000,4000,3000,2000],itemStyle:{color:C.purple}},
+    {name:'B2B',type:'line',stack:'t',areaStyle:{},data:[2000,5000,8000,12000,16000],itemStyle:{color:C.green}},
+    {name:'B2C',type:'line',stack:'t',areaStyle:{},data:[1000,2500,4000,6000,8000],itemStyle:{color:C.cyan}},
+    {name:'Международные',type:'line',stack:'t',areaStyle:{},data:[0,500,1500,3000,5000],itemStyle:{color:C.pink}}
+  ]
+});
+
+window.addEventListener('resize',()=>{c1.resize();c2.resize();c3.resize()});
+</script>
+</body>
+</html>

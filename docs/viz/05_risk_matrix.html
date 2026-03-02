@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Матрица рисков + SWOT — VR-экосистема СПб</title>
+<script src="https://cdn.jsdelivr.net/npm/echarts@5.5.1/dist/echarts.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#0f0f23;--card:#1a1a2e;--text:#e0e0e0;--text2:#8888aa;--accent:#6366f1;--green:#22c55e;--amber:#f59e0b;--red:#ef4444;--cyan:#06b6d4;--radius:12px}
+body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,-apple-system,sans-serif}
+nav{padding:15px 40px;border-bottom:1px solid #222}
+nav a{color:var(--accent);text-decoration:none;font-size:.85rem}
+header{padding:30px 40px 10px}
+header h1{font-size:1.6rem;font-weight:700}
+header p{color:var(--text2);margin-top:6px;font-size:.9rem}
+main{padding:10px 40px 60px;display:grid;gap:24px}
+.chart-card{background:var(--card);border-radius:var(--radius);padding:24px;border:1px solid #222}
+.chart-card h2{font-size:1.1rem;margin-bottom:4px}
+.chart-card .subtitle{color:var(--text2);font-size:.8rem;margin-bottom:16px}
+.chart-box{width:100%;height:550px}
+.source{color:var(--text2);font-size:.75rem;margin-top:12px;font-style:italic}
+.swot-grid{display:grid;grid-template-columns:1fr 1fr;gap:2px;margin-top:16px;border-radius:var(--radius);overflow:hidden}
+.swot-cell{padding:20px}
+.swot-cell h3{font-size:1rem;margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.swot-cell ul{list-style:none;font-size:.85rem;line-height:1.8}
+.swot-cell ul li::before{content:'→ ';color:var(--text2)}
+.s-cell{background:rgba(34,197,94,.08)}.s-cell h3{color:var(--green)}
+.w-cell{background:rgba(239,68,68,.08)}.w-cell h3{color:var(--red)}
+.o-cell{background:rgba(99,102,241,.08)}.o-cell h3{color:var(--accent)}
+.t-cell{background:rgba(245,158,11,.08)}.t-cell h3{color:var(--amber)}
+footer{text-align:center;padding:20px;color:var(--text2);font-size:.8rem;border-top:1px solid #222}
+@media(max-width:768px){main{padding:10px 15px}.chart-box{height:400px}.swot-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<nav><a href="index.html">← Все визуализации</a></nav>
+<header>
+  <h1>Матрица рисков + SWOT-анализ</h1>
+  <p>18 рисков × Вероятность × Влияние. Наведите на ячейку для деталей.</p>
+</header>
+<main>
+  <div class="chart-card">
+    <h2>Тепловая карта рисков (Вероятность × Влияние)</h2>
+    <div class="subtitle">Размер и цвет = приоритет. Наведите курсор для деталей риска.</div>
+    <div id="heatmap" class="chart-box"></div>
+    <p class="source">Источник: Глава 12, раздел 12.3 — Расширенная матрица рисков</p>
+  </div>
+
+  <div class="chart-card">
+    <h2>SWOT-анализ проекта</h2>
+    <div class="swot-grid">
+      <div class="swot-cell s-cell">
+        <h3>💪 Сильные стороны (7)</h3>
+        <ul>
+          <li>Готовая инфраструктура оператора (ЦОД, IT, 22 филиала)</li>
+          <li>Уникальный механизм финансирования (VR-отчётность 2-5%)</li>
+          <li>Политический момент (Год культуры 2026)</li>
+          <li>Успешные пилоты (Эрмитаж VR, Петергоф VR)</li>
+          <li>Доступность оборудования (Pico 4 Ultra, DPVR)</li>
+          <li>Зрелость технологий (GS, 360°, fleet mgmt)</li>
+          <li>Социальная миссия (инклюзия, доступность)</li>
+        </ul>
+      </div>
+      <div class="swot-cell w-cell">
+        <h3>🔻 Слабые стороны (5)</h3>
+        <ul>
+          <li>Кадровый дефицит VR-специалистов</li>
+          <li>Правовой вакуум (статус VR-контента)</li>
+          <li>Отсутствие российских VR-платформ</li>
+          <li>Низкая VR-грамотность населения</li>
+          <li>Зависимость от импортного оборудования</li>
+        </ul>
+      </div>
+      <div class="swot-cell o-cell">
+        <h3>🚀 Возможности (7)</h3>
+        <ul>
+          <li>Год культуры 2026 — политический контекст</li>
+          <li>НП «Экономика данных» 2025-2030</li>
+          <li>AI-революция: снижение стоимости контента в 3-5×</li>
+          <li>Пушкинская карта: 10+ млн пользователей</li>
+          <li>Международный потенциал «Петербург VR»</li>
+          <li>WebXR: масштабирование без шлемов</li>
+          <li>Тиражирование в 85+ регионов РФ</li>
+        </ul>
+      </div>
+      <div class="swot-cell t-cell">
+        <h3>⚡ Угрозы (5)</h3>
+        <ul>
+          <li>Усиление санкций (прекращение поставок)</li>
+          <li>Секвестр бюджетов культуры</li>
+          <li>Быстрое устаревание технологий (1-2 года)</li>
+          <li>Конкуренция за внимание (AI, AR, метавселенные)</li>
+          <li>Негативный UX (кибертошнота → антиреклама)</li>
+        </ul>
+      </div>
+    </div>
+    <p class="source">Источник: Глава 12, раздел 12.2 — SWOT-анализ</p>
+  </div>
+</main>
+<footer>VR-экосистема СПб &bull; Глава 12. Риски и рекомендации &bull; 2026</footer>
+
+<script>
+const risks = [
+  {id:'R1',name:'Зависимость от единого финансирования',cat:'Финансовый',p:4,i:5,mit:'Диверсификация: B2G+B2B+B2C+гранты с Года 1'},
+  {id:'R2',name:'Не набрать VR-специалистов',cat:'Кадровый',p:4,i:4,mit:'Обучение + ИТМО + аутсорс'},
+  {id:'R3',name:'Нет контент-пайплайна',cat:'Аудиторный',p:3,i:5,mit:'≥1 произведение/месяц'},
+  {id:'R5',name:'Авторско-правовые конфликты',cat:'Правовой',p:3,i:4,mit:'Типовые договоры co-production'},
+  {id:'R6',name:'Бюрократическое сопротивление',cat:'Организационный',p:4,i:3,mit:'Начать с 3-5 лояльных партнёров'},
+  {id:'R4',name:'Прекращение поставок Pico/DPVR',cat:'Технологический',p:2,i:5,mit:'Запас 20%, альтернативные поставщики'},
+  {id:'R8',name:'Кибертошнота у пожилых/детей',cat:'Аудиторный',p:3,i:3,mit:'Протокол первого контакта'},
+  {id:'R9',name:'Гранты не проходят отбор',cat:'Финансовый',p:3,i:3,mit:'Подавать в 3+ фонда'},
+  {id:'R12',name:'Текучка ключевых специалистов',cat:'Кадровый',p:3,i:3,mit:'Зарплаты +15-20%, наставничество'},
+  {id:'R10',name:'Моральное устаревание шлемов',cat:'Технологический',p:4,i:2,mit:'Лизинг, цикл обновления 2-3 года'},
+  {id:'R17',name:'Инфляция повышает OPEX',cat:'Финансовый',p:4,i:2,mit:'Индексация, AI-оптимизация'},
+  {id:'R7',name:'Деградация контента (форматы)',cat:'Технологический',p:2,i:4,mit:'OAIS, миграция каждые 5 лет'},
+  {id:'R11',name:'Негативное медиа-покрытие',cat:'Репутационный',p:2,i:4,mit:'Проактивный PR, научные публикации'},
+  {id:'R13',name:'Смена политических приоритетов',cat:'Внешний',p:2,i:4,mit:'Привязка к стратегии 2030, KPI города'},
+  {id:'R15',name:'Низкая посещаемость (<10K)',cat:'Аудиторный',p:2,i:4,mit:'Школы, «нулевой день», события'},
+  {id:'R14',name:'Требования 152-ФЗ к VR-данным',cat:'Правовой',p:2,i:3,mit:'Минимизация ПДн, privacy by design'},
+  {id:'R16',name:'Недоступность облачного VR',cat:'Технологический',p:3,i:2,mit:'Standalone APK как основа'},
+  {id:'R18',name:'Пандемия / ЧС',cat:'Внешний',p:1,i:5,mit:'WebXR, доставка шлемов на дом'}
+];
+
+// Build scatter data: [probability, impact, priority, index]
+const scatterData = risks.map((r,idx)=>[r.p, r.i, r.p*r.i, idx]);
+const catColors = {
+  'Финансовый':'#ef4444','Кадровый':'#ec4899','Аудиторный':'#f59e0b',
+  'Технологический':'#06b6d4','Правовой':'#8b5cf6','Организационный':'#6366f1',
+  'Репутационный':'#f97316','Внешний':'#64748b'
+};
+
+const ch1 = echarts.init(document.getElementById('heatmap'),'dark');
+ch1.setOption({
+  backgroundColor:'#1a1a2e',
+  tooltip:{trigger:'item',formatter:function(p){
+    const r=risks[p.data[3]];
+    return '<b style="color:'+catColors[r.cat]+'">'+r.id+': '+r.name+'</b><br>'+
+      'Категория: '+r.cat+'<br>'+
+      'Вероятность: '+r.p+'/5<br>'+
+      'Влияние: '+r.i+'/5<br>'+
+      '<b>Приоритет: '+(r.p*r.i)+'</b><br><br>'+
+      '<span style="color:#aaa">Митигация:</span> '+r.mit;
+  }},
+  toolbox:{right:10,feature:{saveAsImage:{title:'PNG'}}},
+  grid:{left:80,right:40,bottom:60,top:40},
+  xAxis:{type:'value',name:'Вероятность →',nameLocation:'center',nameGap:35,min:0.5,max:5.5,
+    interval:1,axisLabel:{color:'#aaa',formatter:'{value}'},nameTextStyle:{color:'#aaa',fontSize:13},splitLine:{lineStyle:{color:'#333'}}},
+  yAxis:{type:'value',name:'Влияние →',nameLocation:'center',nameGap:50,min:0.5,max:5.5,
+    interval:1,axisLabel:{color:'#aaa',formatter:'{value}'},nameTextStyle:{color:'#aaa',fontSize:13},splitLine:{lineStyle:{color:'#333'}}},
+  series:[{
+    type:'scatter',
+    data:scatterData,
+    symbolSize:function(d){return Math.max(20, d[2]*3.5)},
+    itemStyle:{color:function(p){return catColors[risks[p.data[3]].cat]},borderColor:'#fff',borderWidth:1,opacity:.85},
+    label:{show:true,formatter:function(p){return risks[p.data[3]].id},fontSize:10,color:'#fff',fontWeight:'bold'},
+    emphasis:{itemStyle:{shadowBlur:15,shadowColor:'rgba(255,255,255,.3)'},label:{fontSize:12}}
+  }],
+  // Background zones
+  graphic:[
+    {type:'rect',left:'6%',top:'4%',shape:{width:200,height:150},style:{fill:'rgba(239,68,68,0.06)'},silent:true,z:-1},
+  ]
+});
+
+window.addEventListener('resize',()=>{ch1.resize()});
+</script>
+</body>
+</html>

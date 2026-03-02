@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Распределение по категориям — Мониторинг Telegram</title>
+<script src="https://cdn.jsdelivr.net/npm/echarts@5.5.1/dist/echarts.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#0f0f23;--card:#1a1a2e;--text:#e0e0e0;--text2:#8888aa;--accent:#6366f1;--radius:12px}
+body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,sans-serif}
+nav{padding:15px 40px;border-bottom:1px solid #222}nav a{color:var(--accent);text-decoration:none;font-size:.85rem}
+header{padding:30px 40px 10px;max-width:1400px;margin:auto}
+header h1{font-size:1.6rem;font-weight:700;background:linear-gradient(135deg,var(--accent),#06b6d4);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+header p{color:var(--text2);margin-top:6px;font-size:.9rem}
+main{padding:20px 40px 60px;max-width:1400px;margin:auto}
+.chart-card{background:var(--card);border-radius:var(--radius);padding:24px;border:1px solid #222}
+#barChart{width:100%;height:650px}
+.facts{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:24px}
+.fact{background:#16162c;border-radius:10px;padding:16px;text-align:center;border:1px solid #222}
+.fact .val{font-size:1.8rem;font-weight:700}
+.fact .label{font-size:.75rem;color:var(--text2);margin-top:4px}
+.c-accent{color:var(--accent)}.c-green{color:#22c55e}.c-amber{color:#f59e0b}
+</style>
+</head>
+<body>
+<nav><a href="../monitoring-viz/">← Мониторинг</a></nav>
+<header>
+<h1>📊 Распределение публикаций по категориям</h1>
+<p>Годовой мониторинг: март 2025 — февраль 2026</p>
+</header>
+<main>
+<div class="facts">
+<div class="fact"><div class="val c-accent">15 482</div><div class="label">Всего проанализировано</div></div>
+<div class="fact"><div class="val c-green">3 393</div><div class="label">Релевантных (22%)</div></div>
+<div class="fact"><div class="val c-amber">13</div><div class="label">Категорий</div></div>
+</div>
+<div class="chart-card">
+<div id="barChart"></div>
+</div>
+</main>
+<script>
+const categories = [
+  {name: 'Робототехника / Embodied AI', value: 1169, color: '#ef4444'},
+  {name: 'Генеративное видео', value: 1127, color: '#f59e0b'},
+  {name: 'Культура / Музеи / Наследие', value: 845, color: '#6366f1'},
+  {name: 'Генеративная музыка и аудио', value: 626, color: '#22c55e'},
+  {name: 'Аватары и Motion Capture', value: 276, color: '#ec4899'},
+  {name: '3D генерация (Text/Image/Video-to-3D)', value: 126, color: '#06b6d4'},
+  {name: 'Gaussian Splatting / NeRF', value: 113, color: '#8b5cf6'},
+  {name: 'Генерация интерактивных миров', value: 89, color: '#f97316'},
+  {name: 'Метавселенная / VR общее', value: 64, color: '#64748b'},
+  {name: 'LiDAR / Фотограмметрия / Сканирование', value: 55, color: '#14b8a6'},
+  {name: 'Unity / Unreal / Движки', value: 30, color: '#a855f7'},
+  {name: 'VR/AR шлемы и устройства', value: 28, color: '#3b82f6'},
+  {name: 'Volumetric Capture', value: 9, color: '#78716c'}
+];
+
+const total = 3393;
+
+const chart = echarts.init(document.getElementById('barChart'), 'dark');
+chart.setOption({
+  backgroundColor: 'transparent',
+  tooltip: {
+    trigger: 'axis',
+    axisPointer: { type: 'shadow' },
+    formatter: function(params) {
+      const d = params[0];
+      const pct = (d.value / total * 100).toFixed(1);
+      return `<b>${d.name}</b><br/>Публикаций: ${d.value}<br/>Доля: ${pct}%`;
+    }
+  },
+  grid: { top: 10, right: 120, bottom: 20, left: 280 },
+  xAxis: { type: 'value', axisLabel: { fontSize: 12 } },
+  yAxis: {
+    type: 'category',
+    data: categories.map(c => c.name).reverse(),
+    axisLabel: { fontSize: 12, width: 260, overflow: 'truncate' }
+  },
+  series: [{
+    type: 'bar',
+    data: categories.map(c => ({
+      value: c.value,
+      itemStyle: { color: c.color, borderRadius: [0, 6, 6, 0] }
+    })).reverse(),
+    barWidth: 28,
+    label: {
+      show: true,
+      position: 'right',
+      formatter: function(p) {
+        return p.value + ' (' + (p.value / total * 100).toFixed(1) + '%)';
+      },
+      fontSize: 12,
+      color: '#e0e0e0'
+    }
+  }]
+});
+
+window.addEventListener('resize', () => chart.resize());
+</script>
+</body>
+</html>

@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>S-кривая технологической зрелости — Мониторинг Telegram</title>
+<script src="https://cdn.jsdelivr.net/npm/echarts@5.5.1/dist/echarts.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#0f0f23;--card:#1a1a2e;--text:#e0e0e0;--text2:#8888aa;--accent:#6366f1;--radius:12px}
+body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,sans-serif}
+nav{padding:15px 40px;border-bottom:1px solid #222}nav a{color:var(--accent);text-decoration:none;font-size:.85rem}
+header{padding:30px 40px 10px;max-width:1400px;margin:auto}
+header h1{font-size:1.6rem;font-weight:700;background:linear-gradient(135deg,var(--accent),#06b6d4);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+header p{color:var(--text2);margin-top:6px;font-size:.9rem}
+main{padding:20px 40px 60px;max-width:1400px;margin:auto;display:grid;gap:24px}
+.chart-card{background:var(--card);border-radius:var(--radius);padding:24px;border:1px solid #222}
+.chart-card h2{font-size:1.1rem;margin-bottom:4px}
+.chart-card .sub{color:var(--text2);font-size:.8rem;margin-bottom:16px}
+#scurve{width:100%;height:500px}
+#sparklines{width:100%;height:400px}
+.legend-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:16px}
+.legend-item{display:flex;align-items:center;gap:8px;padding:10px;background:#16162c;border-radius:8px;border:1px solid #222;font-size:.82rem}
+.legend-dot{width:12px;height:12px;border-radius:50%;flex-shrink:0}
+.legend-phase{font-size:.7rem;color:var(--text2);margin-top:2px}
+@media(max-width:768px){.legend-grid{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body>
+<nav><a href="../monitoring-viz/">← Мониторинг</a></nav>
+<header>
+<h1>🔬 S-кривая технологической зрелости</h1>
+<p>Классификация технологий по фазам жизненного цикла на основе динамики публикаций</p>
+</header>
+<main>
+<div class="chart-card">
+<h2>Позиционирование технологий на S-кривой</h2>
+<div class="sub">По горизонтали — фаза зрелости, по вертикали — средняя частота упоминаний в месяц</div>
+<div id="scurve"></div>
+<div class="legend-grid">
+<div class="legend-item">
+<div class="legend-dot" style="background:#ef4444"></div>
+<div><b>Робототехника</b><div class="legend-phase">Пик роста · 97 публ./мес.</div></div>
+</div>
+<div class="legend-item">
+<div class="legend-dot" style="background:#f59e0b"></div>
+<div><b>Генеративное видео</b><div class="legend-phase">Пик роста · 94 публ./мес.</div></div>
+</div>
+<div class="legend-item">
+<div class="legend-dot" style="background:#6366f1"></div>
+<div><b>Культура / Музеи</b><div class="legend-phase">Устойчивый рост · 70 публ./мес.</div></div>
+</div>
+<div class="legend-item">
+<div class="legend-dot" style="background:#22c55e"></div>
+<div><b>Генеративная музыка</b><div class="legend-phase">Устойчивый рост · 52 публ./мес.</div></div>
+</div>
+<div class="legend-item">
+<div class="legend-dot" style="background:#ec4899"></div>
+<div><b>Аватары / MoCap</b><div class="legend-phase">Рост · 23 публ./мес.</div></div>
+</div>
+<div class="legend-item">
+<div class="legend-dot" style="background:#8b5cf6"></div>
+<div><b>Gaussian Splatting</b><div class="legend-phase">Плато зрелости · 9 публ./мес.</div></div>
+</div>
+<div class="legend-item">
+<div class="legend-dot" style="background:#f97316"></div>
+<div><b>Генерация миров</b><div class="legend-phase">Ранний рост · 7 публ./мес.</div></div>
+</div>
+<div class="legend-item">
+<div class="legend-dot" style="background:#06b6d4"></div>
+<div><b>3D генерация</b><div class="legend-phase">Рост · 11 публ./мес.</div></div>
+</div>
+<div class="legend-item">
+<div class="legend-dot" style="background:#78716c"></div>
+<div><b>Volumetric Capture</b><div class="legend-phase">Зарождение · 1 публ./мес.</div></div>
+</div>
+</div>
+</div>
+<div class="chart-card">
+<h2>Мини-графики: динамика ключевых технологий</h2>
+<div class="sub">12 месяцев мониторинга для каждой технологии</div>
+<div id="sparklines"></div>
+</div>
+</main>
+<script>
+// S-curve scatter plot
+const scurve = echarts.init(document.getElementById('scurve'), 'dark');
+
+// Phases: 0=Emergence, 1=Early Growth, 2=Growth, 3=Peak Growth, 4=Plateau
+const techs = [
+  { name: 'Робототехника / Embodied AI', phase: 3.5, avgMonthly: 97, size: 50, color: '#ef4444' },
+  { name: 'Генеративное видео', phase: 3.2, avgMonthly: 94, size: 48, color: '#f59e0b' },
+  { name: 'Культура / Музеи', phase: 2.5, avgMonthly: 70, size: 40, color: '#6366f1' },
+  { name: 'Генеративная музыка', phase: 2.3, avgMonthly: 52, size: 35, color: '#22c55e' },
+  { name: 'Аватары / MoCap', phase: 2.0, avgMonthly: 23, size: 25, color: '#ec4899' },
+  { name: '3D генерация', phase: 1.8, avgMonthly: 11, size: 20, color: '#06b6d4' },
+  { name: 'Gaussian Splatting / NeRF', phase: 4.0, avgMonthly: 9, size: 22, color: '#8b5cf6' },
+  { name: 'Генерация миров', phase: 1.2, avgMonthly: 7, size: 18, color: '#f97316' },
+  { name: 'Метавселенная / VR', phase: 1.5, avgMonthly: 5, size: 15, color: '#64748b' },
+  { name: 'Volumetric Capture', phase: 0.5, avgMonthly: 1, size: 12, color: '#78716c' }
+];
+
+// S-curve background line
+const sCurvePoints = [];
+for (let x = 0; x <= 5; x += 0.1) {
+  const y = 120 / (1 + Math.exp(-2.5 * (x - 2.5)));
+  sCurvePoints.push([x, y]);
+}
+
+scurve.setOption({
+  backgroundColor: 'transparent',
+  tooltip: {
+    formatter: function(p) {
+      if (p.seriesName === 'S-кривая') return '';
+      const t = techs[p.dataIndex];
+      const phases = ['Зарождение', 'Ранний рост', 'Рост', 'Пик роста', 'Плато'];
+      const phaseIdx = Math.min(4, Math.round(t.phase));
+      return `<b>${t.name}</b><br/>Фаза: ${phases[phaseIdx]}<br/>Среднее: ${t.avgMonthly} публ./мес.`;
+    }
+  },
+  grid: { top: 30, right: 30, bottom: 60, left: 60 },
+  xAxis: {
+    type: 'value',
+    min: 0, max: 5,
+    axisLabel: { show: false },
+    splitLine: { show: false },
+    axisLine: { lineStyle: { color: '#333' } }
+  },
+  yAxis: {
+    type: 'value',
+    name: 'Среднее публ./мес.',
+    nameTextStyle: { fontSize: 11, color: '#8888aa' },
+    axisLine: { lineStyle: { color: '#333' } },
+    splitLine: { lineStyle: { color: '#222' } }
+  },
+  series: [
+    // S-curve background
+    {
+      name: 'S-кривая',
+      type: 'line',
+      data: sCurvePoints,
+      smooth: true,
+      lineStyle: { color: '#333', width: 2, type: 'dashed' },
+      symbol: 'none',
+      silent: true,
+      z: 1
+    },
+    // Technology bubbles
+    {
+      name: 'Технологии',
+      type: 'scatter',
+      data: techs.map(t => [t.phase, t.avgMonthly]),
+      symbolSize: function(data, params) { return techs[params.dataIndex].size; },
+      itemStyle: {
+        color: function(params) { return techs[params.dataIndex].color; },
+        shadowBlur: 10,
+        shadowColor: 'rgba(0,0,0,0.3)'
+      },
+      label: {
+        show: true,
+        position: 'top',
+        formatter: function(p) { return techs[p.dataIndex].name.split('/')[0].trim(); },
+        fontSize: 10,
+        color: '#ccc'
+      },
+      z: 2
+    }
+  ],
+  graphic: [
+    { type: 'text', left: '8%', bottom: 25, style: { text: '🌱 Зарождение', fill: '#666', fontSize: 11 } },
+    { type: 'text', left: '28%', bottom: 25, style: { text: '🌿 Ранний рост', fill: '#666', fontSize: 11 } },
+    { type: 'text', left: '48%', bottom: 25, style: { text: '📈 Рост', fill: '#666', fontSize: 11 } },
+    { type: 'text', left: '65%', bottom: 25, style: { text: '🚀 Пик', fill: '#666', fontSize: 11 } },
+    { type: 'text', left: '82%', bottom: 25, style: { text: '⚡ Плато', fill: '#666', fontSize: 11 } }
+  ]
+});
+
+// Sparklines
+const months = ['Мар','Апр','Май','Июн','Июл','Авг','Сен','Окт','Ноя','Дек','Янв','Фев'];
+const sparkData = {
+  'Gaussian Splatting': { data: [8,5,8,8,8,13,11,12,9,14,10,7], color: '#8b5cf6' },
+  'Генеративное видео': { data: [63,57,81,98,109,97,105,142,64,118,70,121], color: '#f59e0b' },
+  'Генерация миров': { data: [4,1,3,4,1,22,3,3,3,10,21,13], color: '#f97316' },
+  'Культура / Музеи': { data: [54,41,53,62,68,59,80,116,82,83,73,71], color: '#6366f1' },
+  'Аватары / MoCap': { data: [15,21,27,24,22,27,33,18,11,28,22,27], color: '#ec4899' },
+  'Робототехника': { data: [61,69,88,68,85,112,118,127,108,119,97,113], color: '#ef4444' }
+};
+
+const spark = echarts.init(document.getElementById('sparklines'), 'dark');
+const sparkSeries = Object.entries(sparkData).map(([name, d]) => ({
+  name: name,
+  type: 'line',
+  data: d.data,
+  smooth: true,
+  symbol: 'circle',
+  symbolSize: 5,
+  lineStyle: { width: 2.5, color: d.color },
+  itemStyle: { color: d.color },
+  areaStyle: { opacity: 0.08, color: d.color }
+}));
+
+spark.setOption({
+  backgroundColor: 'transparent',
+  tooltip: { trigger: 'axis' },
+  legend: { bottom: 0, textStyle: { fontSize: 11 } },
+  grid: { top: 20, right: 30, bottom: 60, left: 50 },
+  xAxis: { type: 'category', data: months, axisLabel: { fontSize: 11 } },
+  yAxis: { type: 'value', axisLabel: { fontSize: 11 } },
+  series: sparkSeries
+});
+
+window.addEventListener('resize', () => { scurve.resize(); spark.resize(); });
+</script>
+</body>
+</html>
