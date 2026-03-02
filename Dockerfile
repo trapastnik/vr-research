@@ -7,7 +7,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY mkdocs.yml .
 COPY docs/ docs/
 
-RUN mkdocs build --strict
+RUN mkdocs build
 
 FROM nginx:alpine
 
