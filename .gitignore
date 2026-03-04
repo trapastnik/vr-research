@@ -19,6 +19,11 @@ venv/
 # MkDocs build output
 site/
 
+# Generated docs (adapt_docs.py creates these from research/)
+# Manual files (monitoring.md, viz/, monitoring-viz/, assets/) stay tracked
+docs/index.md
+docs/[0-1][0-9]-*.md
+
 # Telegram scraper data
 telegram_scraper/output/
 telegram_scraper/output_year/

@@ -19,11 +19,12 @@ research/           <- Исходные тексты глав (source of truth)
   build_epub.sh     <- Сборка EPUB-книги
 
 adapt_docs.py       <- Конвертер research/ -> docs/
-docs/               <- Сгенерированные файлы для MkDocs
-  monitoring.md     <- Страница мониторинга (ручная)
-  monitoring-viz/   <- Визуализации мониторинга
-  viz/              <- Визуализации глав
-  assets/           <- CSS
+docs/               <- Частично генерируемая, частично ручная
+  *.md              <- Генерируются adapt_docs.py (не в git)
+  monitoring.md     <- Страница мониторинга (ручная, в git)
+  monitoring-viz/   <- Визуализации мониторинга (в git)
+  viz/              <- Визуализации глав (в git)
+  assets/           <- CSS (в git)
 
 telegram_scraper/   <- Скрейпер Telegram-каналов
   scraper.py        <- Сбор за 30 дней
