@@ -66,6 +66,61 @@
   }
 }
 
+/* ── Drag handle for dynamic width control ── */
+.width-handle-wrapper {
+  position: fixed;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 100;
+  display: flex;
+  align-items: center;
+}
+
+.width-handle {
+  width: 6px;
+  height: 64px;
+  background: var(--md-accent-fg-color);
+  border-radius: 3px 0 0 3px;
+  cursor: col-resize;
+  opacity: 0.35;
+  transition: opacity 0.2s, height 0.2s, width 0.2s;
+}
+
+.width-handle:hover,
+.width-handle.active {
+  opacity: 0.85;
+  height: 96px;
+  width: 8px;
+}
+
+.width-handle-tooltip {
+  position: absolute;
+  right: 16px;
+  background: var(--md-default-bg-color);
+  color: var(--md-default-fg-color);
+  border: 1px solid var(--md-default-fg-color--lightest);
+  border-radius: 6px;
+  padding: 4px 10px;
+  font-size: 0.75rem;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.width-handle-tooltip.visible {
+  opacity: 1;
+}
+
+/* Hide on mobile — not useful there */
+@media (max-width: 960px) {
+  .width-handle-wrapper {
+    display: none;
+  }
+}
+
 /* Improve table readability */
 .md-typeset table:not([class]) {
   font-size: 0.82rem;

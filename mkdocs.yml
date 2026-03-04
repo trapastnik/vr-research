@@ -86,3 +86,6 @@ markdown_extensions:
 
 extra_css:
   - assets/stylesheets/extra.css
+
+extra_javascript:
+  - assets/javascripts/width-control.js
