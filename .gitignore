@@ -1,11 +1,26 @@
-.DS_Store
+# macOS
+**/.DS_Store
+
+# Python
 __pycache__/
 *.pyc
-*.session
 venv/
 .venv/
-site/
+**/venv/
+**/.venv/
+
+# Telethon sessions
+*.session
+
+# Environment
 .env
+
+# MkDocs build output
+site/
+
+# Telegram scraper data
 telegram_scraper/output/
 telegram_scraper/output_year/
+
+# Misc
 path/

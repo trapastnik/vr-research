@@ -850,10 +850,10 @@ VR-контент предъявляет экстремальные требов
 ## Интерактивные визуализации
 
 <div class="viz-container" markdown="0">
-  <iframe src="../viz/06_technology.html" width="100%" height="700" frameborder="0"></iframe>
+  <iframe src="viz/06_technology.html" width="100%" height="700" frameborder="0"></iframe>
 </div>
 
-[Открыть в полном окне](./viz/06_technology.html){target=_blank}
+[Открыть в полном окне](viz/06_technology.html){target=_blank}
 
 
 ## Список источников

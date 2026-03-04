@@ -209,10 +209,10 @@
 ## Интерактивные визуализации
 
 <div class="viz-container" markdown="0">
-  <iframe src="../viz/05_risk_matrix.html" width="100%" height="700" frameborder="0"></iframe>
+  <iframe src="viz/05_risk_matrix.html" width="100%" height="700" frameborder="0"></iframe>
 </div>
 
-[Открыть в полном окне](./viz/05_risk_matrix.html){target=_blank}
+[Открыть в полном окне](viz/05_risk_matrix.html){target=_blank}
 
 ---
 

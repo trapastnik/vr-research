@@ -662,22 +662,22 @@
 ## Интерактивные визуализации
 
 <div class="viz-container" markdown="0">
-  <iframe src="../viz/04_budget.html" width="100%" height="600" frameborder="0"></iframe>
+  <iframe src="viz/04_budget.html" width="100%" height="600" frameborder="0"></iframe>
 </div>
 
-[Открыть в полном окне](./viz/04_budget.html){target=_blank}
+[Открыть в полном окне](viz/04_budget.html){target=_blank}
 
 <div class="viz-container" markdown="0">
-  <iframe src="../viz/07_roadmap.html" width="100%" height="700" frameborder="0"></iframe>
+  <iframe src="viz/07_roadmap.html" width="100%" height="700" frameborder="0"></iframe>
 </div>
 
-[Открыть в полном окне](./viz/07_roadmap.html){target=_blank}
+[Открыть в полном окне](viz/07_roadmap.html){target=_blank}
 
 <div class="viz-container" markdown="0">
-  <iframe src="../viz/11_kpi_dashboard.html" width="100%" height="600" frameborder="0"></iframe>
+  <iframe src="viz/11_kpi_dashboard.html" width="100%" height="600" frameborder="0"></iframe>
 </div>
 
-[Открыть в полном окне](./viz/11_kpi_dashboard.html){target=_blank}
+[Открыть в полном окне](viz/11_kpi_dashboard.html){target=_blank}
 
 
 ## Список источников
