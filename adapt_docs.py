@@ -289,9 +289,9 @@ def add_viz_embeds(text, chapter_num):
         # Nice title from filename
         viz_name = viz_file.replace('.html', '').replace('_', ' ').title()
         viz_block.append(f'<div class="viz-container" markdown="0">')
-        viz_block.append(f'  <iframe src="viz/{viz_file}" width="100%" height="{height}" frameborder="0"></iframe>')
+        viz_block.append(f'  <iframe src="../viz/{viz_file}" width="100%" height="{height}" frameborder="0"></iframe>')
         viz_block.append(f'</div>\n')
-        viz_block.append(f'[Открыть в полном окне](viz/{viz_file}){{target=_blank}}\n')
+        viz_block.append(f'<a href="../viz/{viz_file}" target="_blank">Открыть в полном окне</a>\n')
 
     # Insert before "## Источники" or at end
     source_match = re.search(r'\n## (?:Источники|Список источников|Литература)\b', text)

@@ -15,10 +15,10 @@
 Графики с линиями позволяют отследить сезонность и тренды каждой технологии.
 
 <div class="viz-container" markdown="0">
-  <iframe src="monitoring-viz/monthly_dynamics.html" width="100%" height="900" frameborder="0"></iframe>
+  <iframe src="../monitoring-viz/monthly_dynamics.html" width="100%" height="900" frameborder="0"></iframe>
 </div>
 
-[Открыть в полном окне](monitoring-viz/monthly_dynamics.html){target=_blank}
+<a href="../monitoring-viz/monthly_dynamics.html" target="_blank">Открыть в полном окне</a>
 
 !!! tip "Ключевые наблюдения"
     - **Генеративное видео** — пик в октябре 2025 (142 публ.), связан с выходом Wan 2.1 и Kling O1
@@ -32,10 +32,10 @@
 Общее распределение 3 393 релевантных публикаций по тематическим категориям.
 
 <div class="viz-container" markdown="0">
-  <iframe src="monitoring-viz/category_distribution.html" width="100%" height="800" frameborder="0"></iframe>
+  <iframe src="../monitoring-viz/category_distribution.html" width="100%" height="800" frameborder="0"></iframe>
 </div>
 
-[Открыть в полном окне](monitoring-viz/category_distribution.html){target=_blank}
+<a href="../monitoring-viz/category_distribution.html" target="_blank">Открыть в полном окне</a>
 
 ---
 
@@ -44,10 +44,10 @@
 Анализ вклада каждого из 8 каналов в общий массив релевантных публикаций.
 
 <div class="viz-container" markdown="0">
-  <iframe src="monitoring-viz/channel_contribution.html" width="100%" height="850" frameborder="0"></iframe>
+  <iframe src="../monitoring-viz/channel_contribution.html" width="100%" height="850" frameborder="0"></iframe>
 </div>
 
-[Открыть в полном окне](monitoring-viz/channel_contribution.html){target=_blank}
+<a href="../monitoring-viz/channel_contribution.html" target="_blank">Открыть в полном окне</a>
 
 !!! info "ТОП-3 канала по релевантности"
     1. **Нейронавт | Нейросети в творчестве** — 1 225 релевантных (27% от всех, конверсия 27%)
@@ -62,10 +62,10 @@
 Позволяет мгновенно увидеть «горячие точки» и сезонные паттерны.
 
 <div class="viz-container" markdown="0">
-  <iframe src="monitoring-viz/activity_heatmap.html" width="100%" height="750" frameborder="0"></iframe>
+  <iframe src="../monitoring-viz/activity_heatmap.html" width="100%" height="750" frameborder="0"></iframe>
 </div>
 
-[Открыть в полном окне](monitoring-viz/activity_heatmap.html){target=_blank}
+<a href="../monitoring-viz/activity_heatmap.html" target="_blank">Открыть в полном окне</a>
 
 ---
 
@@ -75,10 +75,10 @@
 на основе динамики и стабильности упоминаний за 12 месяцев.
 
 <div class="viz-container" markdown="0">
-  <iframe src="monitoring-viz/tech_maturity.html" width="100%" height="850" frameborder="0"></iframe>
+  <iframe src="../monitoring-viz/tech_maturity.html" width="100%" height="850" frameborder="0"></iframe>
 </div>
 
-[Открыть в полном окне](monitoring-viz/tech_maturity.html){target=_blank}
+<a href="../monitoring-viz/tech_maturity.html" target="_blank">Открыть в полном окне</a>
 
 !!! warning "Выводы для проекта"
     - **Gaussian Splatting** на плато зрелости (стабильные 7-14 публ./мес.) — **безопасная ставка** для проекта

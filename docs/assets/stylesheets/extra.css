@@ -49,7 +49,21 @@
 
 /* Wider content area for research text */
 .md-grid {
-  max-width: 1440px;
+  max-width: 1800px;
+}
+
+/* Content area expands on wide screens */
+@media (min-width: 1220px) {
+  .md-content {
+    max-width: none;
+  }
+}
+
+/* On very wide screens, use even more space */
+@media (min-width: 1920px) {
+  .md-grid {
+    max-width: 90%;
+  }
 }
 
 /* Improve table readability */
