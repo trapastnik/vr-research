@@ -54,7 +54,11 @@ def load_config():
         print(f"Файл конфигурации не найден: {CONFIG_FILE}")
         sys.exit(1)
     with open(CONFIG_FILE, "r", encoding="utf-8") as f:
-        return json.load(f)
+        config = json.load(f)
+    # Allow .env overrides for sensitive values
+    config["api_id"] = os.environ.get("TG_API_ID", config.get("api_id", ""))
+    config["api_hash"] = os.environ.get("TG_API_HASH", config.get("api_hash", ""))
+    return config
 
 
 def load_progress():

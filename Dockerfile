@@ -4,10 +4,13 @@ WORKDIR /build
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
+COPY adapt_docs.py .
 COPY mkdocs.yml .
+COPY research/ research/
 COPY docs/ docs/
 
-RUN mkdocs build
+# Generate docs from research sources, then build site
+RUN python adapt_docs.py && mkdocs build
 
 FROM nginx:alpine
 
