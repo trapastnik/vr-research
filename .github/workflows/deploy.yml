@@ -9,6 +9,8 @@ on:
       - 'Dockerfile'
       - 'nginx.conf'
       - 'requirements.txt'
+      - '.github/workflows/**'
+  workflow_dispatch:
 
 jobs:
   deploy:
