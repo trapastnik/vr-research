@@ -58,6 +58,7 @@ nav:
     - "Гл.12. Риски и рекомендации": 12-risks.md
     - "Гл.13. Дорожная карта": 13-roadmap.md
   - "📊 Мониторинг Telegram": monitoring.md
+  - "🔒 Проекты": projects.md
 
 plugins:
   - search:
