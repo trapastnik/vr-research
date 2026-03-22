@@ -1,0 +1,915 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Отчёт по ремонту — Малодетскосельский пр. 30</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f0f2f5; color: #1a1a1a; line-height: 1.5; }
+
+.header {
+  background: linear-gradient(135deg, #1a1a2e, #16213e);
+  color: white;
+  padding: 40px 24px;
+  text-align: center;
+}
+.header h1 { font-size: 28px; margin-bottom: 8px; }
+.header .subtitle { opacity: 0.8; font-size: 16px; }
+
+/* Stats bar */
+.stats-bar {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  max-width: 1200px;
+  margin: -30px auto 24px;
+  padding: 0 24px;
+  position: relative;
+  z-index: 1;
+}
+.stat-card {
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  text-align: center;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+}
+.stat-card .number { font-size: 32px; font-weight: 700; }
+.stat-card .label { font-size: 13px; color: #666; margin-top: 4px; }
+.stat-card.red .number { color: #e74c3c; }
+.stat-card.green .number { color: #27ae60; }
+.stat-card.blue .number { color: #2980b9; }
+.stat-card.orange .number { color: #e67e22; }
+
+/* Calendar heatmap */
+.calendar-section {
+  max-width: 1200px;
+  margin: 0 auto 32px;
+  padding: 0 24px;
+}
+.calendar-section h2 {
+  font-size: 20px;
+  margin-bottom: 16px;
+  padding-left: 4px;
+}
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+}
+.cal-header {
+  text-align: center;
+  font-size: 12px;
+  font-weight: 600;
+  color: #666;
+  padding: 4px;
+}
+.cal-day {
+  aspect-ratio: 1;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.15s;
+  position: relative;
+  min-height: 48px;
+}
+.cal-day:hover { transform: scale(1.1); box-shadow: 0 4px 12px rgba(0,0,0,0.15); z-index: 2; }
+.cal-day.work { background: #d4edda; color: #155724; }
+.cal-day.partial { background: #fff3cd; color: #856404; }
+.cal-day.absent { background: #f8d7da; color: #721c24; }
+.cal-day.nodata { background: #e9ecef; color: #6c757d; }
+.cal-day.empty { background: transparent; cursor: default; }
+.cal-day.empty:hover { transform: none; box-shadow: none; }
+.cal-day .day-num { font-size: 15px; }
+.cal-day .day-icon { font-size: 10px; margin-top: 2px; }
+
+.legend {
+  display: flex;
+  gap: 16px;
+  margin-top: 12px;
+  flex-wrap: wrap;
+}
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: #555;
+}
+.legend-dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 4px;
+}
+
+/* Timeline */
+.timeline-section {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px 60px;
+}
+.timeline-section h2 {
+  font-size: 20px;
+  margin-bottom: 24px;
+}
+
+.day-block {
+  margin-bottom: 24px;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+.day-header {
+  padding: 14px 20px;
+  font-weight: 700;
+  font-size: 15px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  user-select: none;
+}
+.day-header .arrow {
+  transition: transform 0.2s;
+  font-size: 12px;
+}
+.day-header.collapsed .arrow { transform: rotate(-90deg); }
+.day-header.work-day { background: #d4edda; color: #155724; }
+.day-header.partial-day { background: #fff3cd; color: #856404; }
+.day-header.absent-day { background: #f8d7da; color: #721c24; }
+.day-header.nodata-day { background: #e9ecef; color: #495057; }
+
+.day-content {
+  background: white;
+  padding: 16px 20px;
+  transition: max-height 0.3s;
+}
+.day-content.hidden { display: none; }
+
+.day-summary {
+  font-size: 14px;
+  margin-bottom: 12px;
+  padding: 10px 14px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  border-left: 4px solid #dee2e6;
+}
+.day-summary.work { border-left-color: #27ae60; }
+.day-summary.absent { border-left-color: #e74c3c; }
+
+/* Messages */
+.messages { display: flex; flex-direction: column; gap: 6px; }
+.msg {
+  padding: 8px 12px;
+  border-radius: 8px;
+  max-width: 85%;
+  font-size: 13px;
+  line-height: 1.4;
+  position: relative;
+}
+.msg .msg-time {
+  font-size: 11px;
+  opacity: 0.6;
+  margin-right: 6px;
+}
+.msg.me {
+  background: #dcf8c6;
+  align-self: flex-end;
+  border-bottom-right-radius: 2px;
+}
+.msg.dm {
+  background: white;
+  border: 1px solid #e0e0e0;
+  align-self: flex-start;
+  border-bottom-left-radius: 2px;
+}
+.msg.evidence {
+  border: 2px solid #e74c3c;
+  background: #fff5f5;
+}
+.msg.evidence::before {
+  content: "📌 Доказательство";
+  display: block;
+  font-size: 10px;
+  font-weight: 700;
+  color: #e74c3c;
+  margin-bottom: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.msg.payment {
+  border: 2px solid #27ae60;
+  background: #f0fff4;
+}
+.msg.payment::before {
+  content: "💰 Оплата";
+  display: block;
+  font-size: 10px;
+  font-weight: 700;
+  color: #27ae60;
+  margin-bottom: 4px;
+  text-transform: uppercase;
+}
+
+/* Photos */
+.photo-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 8px;
+  margin-top: 10px;
+}
+.photo-grid img {
+  width: 100%;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: transform 0.2s;
+  object-fit: cover;
+  aspect-ratio: 4/3;
+}
+.photo-grid img:hover { transform: scale(1.03); }
+
+/* Lightbox */
+.lightbox {
+  display: none;
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.9);
+  z-index: 1000;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+.lightbox.active { display: flex; }
+.lightbox img {
+  max-width: 90vw;
+  max-height: 90vh;
+  border-radius: 8px;
+}
+
+/* Finance chart */
+.finance-section {
+  max-width: 1200px;
+  margin: 0 auto 32px;
+  padding: 0 24px;
+}
+.finance-bar {
+  background: white;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+.finance-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+.finance-date { font-size: 13px; color: #666; width: 70px; }
+.finance-amount { font-size: 15px; font-weight: 700; width: 100px; text-align: right; }
+.finance-bar-fill {
+  height: 28px;
+  border-radius: 6px;
+  background: linear-gradient(90deg, #e74c3c, #c0392b);
+  display: flex;
+  align-items: center;
+  padding: 0 10px;
+  color: white;
+  font-size: 12px;
+  font-weight: 600;
+}
+.finance-desc { font-size: 13px; color: #555; margin-left: 8px; }
+
+/* Absence chart */
+.absence-chart {
+  background: white;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  margin-bottom: 24px;
+}
+.absence-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+.absence-reason { font-size: 13px; width: 200px; }
+.absence-days { font-size: 14px; font-weight: 700; width: 50px; text-align: right; }
+.absence-bar-fill {
+  height: 24px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  padding: 0 8px;
+  color: white;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+@media (max-width: 768px) {
+  .stats-bar { grid-template-columns: repeat(2, 1fr); }
+  .photo-grid { grid-template-columns: repeat(2, 1fr); }
+  .msg { max-width: 95%; }
+  .absence-reason { width: 120px; font-size: 12px; }
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Отчёт по ремонту квартиры</h1>
+  <div class="subtitle">Малодетскосельский пр. 30 — 1 февраля – 22 марта 2026</div>
+</div>
+
+<div class="stats-bar">
+  <div class="stat-card green">
+    <div class="number">13</div>
+    <div class="label">Рабочих дней на объекте</div>
+  </div>
+  <div class="stat-card red">
+    <div class="number">21</div>
+    <div class="label">Дней простоя / отсутствия</div>
+  </div>
+  <div class="stat-card orange">
+    <div class="number">135 000 ₽</div>
+    <div class="label">Переведено исполнителю</div>
+  </div>
+  <div class="stat-card blue">
+    <div class="number">~200 000 ₽</div>
+    <div class="label">Общие вложения</div>
+  </div>
+</div>
+
+<!-- Absence reasons chart -->
+<div class="finance-section">
+  <h2 style="font-size:20px;margin-bottom:16px;">Причины отсутствия исполнителя</h2>
+  <div class="absence-chart">
+    <div class="absence-row">
+      <div class="absence-reason">Нет данных / без контакта</div>
+      <div class="absence-days">7 дн</div>
+      <div class="absence-bar-fill" style="width:280px;background:#95a5a6;">13–18.03, 09.03</div>
+    </div>
+    <div class="absence-row">
+      <div class="absence-reason">Инсульт отца</div>
+      <div class="absence-days">5 дн</div>
+      <div class="absence-bar-fill" style="width:200px;background:#8e44ad;">03–06.03, 08.03</div>
+    </div>
+    <div class="absence-row">
+      <div class="absence-reason">Болезнь (простуда)</div>
+      <div class="absence-days">4 дн</div>
+      <div class="absence-bar-fill" style="width:160px;background:#e74c3c;">10.02, 21–23.02</div>
+    </div>
+    <div class="absence-row">
+      <div class="absence-reason">Другие заказы (Газпром)</div>
+      <div class="absence-days">2 дн</div>
+      <div class="absence-bar-fill" style="width:80px;background:#e67e22;">20.02, 10.03</div>
+    </div>
+    <div class="absence-row">
+      <div class="absence-reason">Личные дела</div>
+      <div class="absence-days">1 дн</div>
+      <div class="absence-bar-fill" style="width:40px;background:#f39c12;">19.02</div>
+    </div>
+    <div class="absence-row">
+      <div class="absence-reason">Нет маляра / организац.</div>
+      <div class="absence-days">2 дн</div>
+      <div class="absence-bar-fill" style="width:80px;background:#bdc3c7;">11.02, 13.02</div>
+    </div>
+  </div>
+</div>
+
+<!-- Finance -->
+<div class="finance-section">
+  <h2 style="font-size:20px;margin-bottom:16px;">Платежи исполнителю</h2>
+  <div class="finance-bar">
+    <div class="finance-row">
+      <div class="finance-date">04.02</div>
+      <div class="finance-amount">20 000 ₽</div>
+      <div class="finance-bar-fill" style="width:calc(20/70 * 100%);">20 000</div>
+      <div class="finance-desc">Первый платёж</div>
+    </div>
+    <div class="finance-row">
+      <div class="finance-date">16.02</div>
+      <div class="finance-amount">45 000 ₽</div>
+      <div class="finance-bar-fill" style="width:calc(45/70 * 100%);">45 000</div>
+      <div class="finance-desc">Аванс за работу</div>
+    </div>
+    <div class="finance-row">
+      <div class="finance-date">28.02</div>
+      <div class="finance-amount">70 000 ₽</div>
+      <div class="finance-bar-fill" style="width:100%;">70 000</div>
+      <div class="finance-desc">Материалы</div>
+    </div>
+  </div>
+</div>
+
+<!-- Calendar -->
+<div class="calendar-section">
+  <h2>Календарь присутствия на объекте</h2>
+
+  <h3 style="margin:16px 0 8px;font-size:15px;color:#555;">Февраль 2026</h3>
+  <div class="calendar-grid">
+    <div class="cal-header">Пн</div><div class="cal-header">Вт</div><div class="cal-header">Ср</div><div class="cal-header">Чт</div><div class="cal-header">Ср</div><div class="cal-header">Сб</div><div class="cal-header">Вс</div>
+    <!-- Feb 2026: starts on Sunday -->
+    <div class="cal-day empty"></div>
+    <div class="cal-day empty"></div>
+    <div class="cal-day empty"></div>
+    <div class="cal-day empty"></div>
+    <div class="cal-day empty"></div>
+    <div class="cal-day nodata" title="01.02 — Нет работ"><div class="day-num">1</div></div>
+    <div class="cal-day nodata" title="02.02 — Обсуждение, фото"><div class="day-num">2</div></div>
+
+    <div class="cal-day nodata" title="03.02 — Обсуждение расценок"><div class="day-num">3</div></div>
+    <div class="cal-day nodata" title="04.02 — Оплата 20000, обсуждение"><div class="day-num">4</div><div class="day-icon">💰</div></div>
+    <div class="cal-day nodata" title="05.02 — Консультации"><div class="day-num">5</div></div>
+    <div class="cal-day nodata" title="06.02 — Смета, согласование"><div class="day-num">6</div></div>
+    <div class="cal-day nodata" title="07.02 — Нет данных"><div class="day-num">7</div></div>
+    <div class="cal-day partial" title="08.02 — Осмотр с Бахромом в 19:00"><div class="day-num">8</div><div class="day-icon">👁️</div></div>
+    <div class="cal-day nodata" title="09.02 — Выходной"><div class="day-num">9</div></div>
+
+    <div class="cal-day absent" title="10.02 — DM болен (промёрз на осмотре)"><div class="day-num">10</div><div class="day-icon">🤒</div></div>
+    <div class="cal-day absent" title="11.02 — Нет маляра, нет закупок"><div class="day-num">11</div><div class="day-icon">❌</div></div>
+    <div class="cal-day nodata" title="12.02 — Сметы в Петровиче"><div class="day-num">12</div></div>
+    <div class="cal-day absent" title="13.02 — Бахром отпущен на другие объекты"><div class="day-num">13</div><div class="day-icon">❌</div></div>
+    <div class="cal-day nodata" title="14.02 — Нет данных"><div class="day-num">14</div></div>
+    <div class="cal-day work" title="15.02 — Демонтаж дверных коробок"><div class="day-num">15</div><div class="day-icon">🔨</div></div>
+    <div class="cal-day work" title="16.02 — Подготовка, оплата 45000"><div class="day-num">16</div><div class="day-icon">💰</div></div>
+
+    <div class="cal-day work" title="17.02 — Демонтаж чулана (DM опоздал)"><div class="day-num">17</div><div class="day-icon">🔨</div></div>
+    <div class="cal-day work" title="18.02 — Мелкие работы"><div class="day-num">18</div><div class="day-icon">🔧</div></div>
+    <div class="cal-day absent" title="19.02 — DM: свои дела, другие проекты"><div class="day-num">19</div><div class="day-icon">❌</div></div>
+    <div class="cal-day absent" title="20.02 — DM: совещание Газпром"><div class="day-num">20</div><div class="day-icon">🏢</div></div>
+    <div class="cal-day absent" title="21.02 — DM болен (t° 37°)"><div class="day-num">21</div><div class="day-icon">🤒</div></div>
+    <div class="cal-day absent" title="22.02 — DM болеет"><div class="day-num">22</div><div class="day-icon">🤒</div></div>
+    <div class="cal-day absent" title="23.02 — DM выздоравливает"><div class="day-num">23</div><div class="day-icon">🤒</div></div>
+
+    <div class="cal-day work" title="24.02 — Демонтаж кухни"><div class="day-num">24</div><div class="day-icon">🔨</div></div>
+    <div class="cal-day work" title="25.02 — Демонтаж кухни, вывоз мусора"><div class="day-num">25</div><div class="day-icon">🚛</div></div>
+    <div class="cal-day work" title="26.02 — Подготовка к малярке (DM один)"><div class="day-num">26</div><div class="day-icon">🔧</div></div>
+    <div class="cal-day work" title="27.02 — Подготовительные работы"><div class="day-num">27</div><div class="day-icon">🔧</div></div>
+    <div class="cal-day work" title="28.02 — Подготовка к затирке, оплата 70000"><div class="day-num">28</div><div class="day-icon">💰</div></div>
+  </div>
+
+  <h3 style="margin:24px 0 8px;font-size:15px;color:#555;">Март 2026</h3>
+  <div class="calendar-grid">
+    <div class="cal-header">Пн</div><div class="cal-header">Вт</div><div class="cal-header">Ср</div><div class="cal-header">Чт</div><div class="cal-header">Пт</div><div class="cal-header">Сб</div><div class="cal-header">Вс</div>
+    <!-- Mar 2026 starts Sunday -->
+    <div class="cal-day empty"></div>
+    <div class="cal-day empty"></div>
+    <div class="cal-day empty"></div>
+    <div class="cal-day empty"></div>
+    <div class="cal-day empty"></div>
+    <div class="cal-day empty"></div>
+    <div class="cal-day work" title="01.03 — Затирка ванной"><div class="day-num">1</div><div class="day-icon">🔧</div></div>
+
+    <div class="cal-day partial" title="02.03 — Завершение затирки (частично)"><div class="day-num">2</div><div class="day-icon">🔧</div></div>
+    <div class="cal-day absent" title="03.03 — Инсульт отца, госпитализация"><div class="day-num">3</div><div class="day-icon">🏥</div></div>
+    <div class="cal-day absent" title="04.03 — DM в больнице у отца"><div class="day-num">4</div><div class="day-icon">🏥</div></div>
+    <div class="cal-day absent" title="05.03 — DM в больнице"><div class="day-num">5</div><div class="day-icon">🏥</div></div>
+    <div class="cal-day absent" title="06.03 — DM в больнице"><div class="day-num">6</div><div class="day-icon">🏥</div></div>
+    <div class="cal-day partial" title="07.03 — DM на другом объекте, планирование"><div class="day-num">7</div><div class="day-icon">📋</div></div>
+    <div class="cal-day absent" title="08.03 — DM у отца в больнице"><div class="day-num">8</div><div class="day-icon">🏥</div></div>
+
+    <div class="cal-day absent" title="09.03 — Простой"><div class="day-num">9</div><div class="day-icon">❌</div></div>
+    <div class="cal-day absent" title="10.03 — DM: Газпром"><div class="day-num">10</div><div class="day-icon">🏢</div></div>
+    <div class="cal-day partial" title="11.03 — Подбор электрики"><div class="day-num">11</div><div class="day-icon">⚡</div></div>
+    <div class="cal-day work" title="12.03 — Мелочёвка + шкурка шпаклёвки"><div class="day-num">12</div><div class="day-icon">🔧</div></div>
+    <div class="cal-day absent" title="13.03 — Нет данных"><div class="day-num">13</div><div class="day-icon">❓</div></div>
+    <div class="cal-day absent" title="14.03 — Нет работ"><div class="day-num">14</div><div class="day-icon">❓</div></div>
+    <div class="cal-day absent" title="15.03 — Нет данных"><div class="day-num">15</div><div class="day-icon">❓</div></div>
+
+    <div class="cal-day absent" title="16.03 — Нет данных"><div class="day-num">16</div><div class="day-icon">❓</div></div>
+    <div class="cal-day absent" title="17.03 — Нет данных"><div class="day-num">17</div><div class="day-icon">❓</div></div>
+    <div class="cal-day absent" title="18.03 — Нет данных"><div class="day-num">18</div><div class="day-icon">❓</div></div>
+    <div class="cal-day absent" title="19.03 — ME: не прошкурено, электрика не сделана"><div class="day-num">19</div><div class="day-icon">⚠️</div></div>
+    <div class="cal-day nodata" title="20.03 — Обсуждение"><div class="day-num">20</div></div>
+    <div class="cal-day nodata" title="21.03 — Нет данных"><div class="day-num">21</div></div>
+    <div class="cal-day nodata" title="22.03 — Нет данных"><div class="day-num">22</div></div>
+  </div>
+
+  <div class="legend">
+    <div class="legend-item"><div class="legend-dot" style="background:#d4edda;"></div> Работал на объекте</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#fff3cd;"></div> Частично / планирование</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#f8d7da;"></div> Отсутствие / простой</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#e9ecef;"></div> Обсуждение / нет данных</div>
+  </div>
+</div>
+
+<!-- TIMELINE -->
+<div class="timeline-section">
+  <h2>Хронология по дням с доказательствами</h2>
+
+  <!-- FEB 2 -->
+  <div class="day-block">
+    <div class="day-header nodata-day" onclick="toggleDay(this)"><span class="arrow">▼</span> 02.02 (вс) — Фотофиксация текущего состояния</div>
+    <div class="day-content">
+      <div class="day-summary">ME напоминает про квартиру, отправляет 9 фото текущего состояния. DM не дозвонился.</div>
+      <div class="messages">
+        <div class="msg me"><span class="msg-time">09:29</span> Ку-ку</div>
+        <div class="msg me"><span class="msg-time">09:29</span> Напоминаю про каартиру</div>
+        <div class="msg me"><span class="msg-time">13:44</span> куку?</div>
+        <div class="msg dm"><span class="msg-time">21:09</span> Я пообщался, но так и не дозвонился до тебя.... Набирай завтра после 9 утра...</div>
+      </div>
+      <div class="photo-grid">
+        <img src="media/Дмитрий_Собиратель_Реликвария_Обэриу/photo_660866.jpg" onclick="openLightbox(this)" alt="Фото квартиры">
+        <img src="media/Дмитрий_Собиратель_Реликвария_Обэриу/photo_660867.jpg" onclick="openLightbox(this)" alt="Фото квартиры">
+        <img src="media/Дмитрий_Собиратель_Реликвария_Обэриу/photo_660868.jpg" onclick="openLightbox(this)" alt="Фото квартиры">
+        <img src="media/Дмитрий_Собиратель_Реликвария_Обэриу/photo_660869.jpg" onclick="openLightbox(this)" alt="Фото квартиры">
+        <img src="media/Дмитрий_Собиратель_Реликвария_Обэриу/photo_660870.jpg" onclick="openLightbox(this)" alt="Фото квартиры">
+        <img src="media/Дмитрий_Собиратель_Реликвария_Обэриу/photo_660871.jpg" onclick="openLightbox(this)" alt="Фото квартиры">
+      </div>
+    </div>
+  </div>
+
+  <!-- FEB 4 -->
+  <div class="day-block">
+    <div class="day-header nodata-day" onclick="toggleDay(this)"><span class="arrow">▼</span> 04.02 (вт) — Оплата 20 000 ₽, фото кухни для Максима</div>
+    <div class="day-content">
+      <div class="day-summary">DM запрашивает 20 000 ₽. Обсуждение плитки (не менять). Фото кухни для проектировщика Максима.</div>
+      <div class="messages">
+        <div class="msg dm"><span class="msg-time">12:41</span> Напоминалочка про 20 000 рубликов...)</div>
+        <div class="msg me"><span class="msg-time">13:00</span> Конечно же помню ещё как вопрос в том что мне пока ничерта не пришло но я активно работаю в этом направлении</div>
+        <div class="msg dm"><span class="msg-time">13:11</span> Плитку в ванной менять планируешь?</div>
+        <div class="msg me"><span class="msg-time">13:11</span> Ты знаешь пока нет наверно всё-таки</div>
+        <div class="msg me payment"><span class="msg-time">14:52</span> Перекинул 20</div>
+      </div>
+      <div class="photo-grid">
+        <img src="media/Дмитрий_Собиратель_Реликвария_Обэриу/photo_661995.jpg" onclick="openLightbox(this)" alt="Фото кухни">
+        <img src="media/Дмитрий_Собиратель_Реликвария_Обэриу/photo_661996.jpg" onclick="openLightbox(this)" alt="Фото кухни">
+        <img src="media/Дмитрий_Собиратель_Реликвария_Обэриу/photo_661997.jpg" onclick="openLightbox(this)" alt="Фото кухни">
+        <img src="media/Дмитрий_Собиратель_Реликвария_Обэриу/photo_661998.jpg" onclick="openLightbox(this)" alt="Фото кухни">
+        <img src="media/Дмитрий_Собиратель_Реликвария_Обэриу/photo_661999.jpg" onclick="openLightbox(this)" alt="Фото кухни">
+        <img src="media/Дмитрий_Собиратель_Реликвария_Обэриу/photo_662000.jpg" onclick="openLightbox(this)" alt="Фото кухни">
+      </div>
+    </div>
+  </div>
+
+  <!-- FEB 10 -->
+  <div class="day-block">
+    <div class="day-header absent-day" onclick="toggleDay(this)"><span class="arrow">▼</span> 10.02 (пн) — ❌ DM болен (промёрз на осмотре)</div>
+    <div class="day-content">
+      <div class="day-summary absent">DM заболел после осмотра 08.02. Присылает смету Бахрома: 99 м², 79 350 руб.</div>
+      <div class="messages">
+        <div class="msg dm evidence"><span class="msg-time">08:36</span> Я вчера всё-таки промерз, пока ждал тебя. Горло болит... Пока не понятно про старт сегодня...</div>
+        <div class="msg dm"><span class="msg-time">09:59</span> Стены + потолки 99 квадратов<br>1. Зашкурить 200×99=19800<br>2. Грунтовка 99×150=14850<br>3. Покраска 99×300=29700<br>4. Затирка ванной 5000<br>5. Ванная стены+потолок 10000<br><b>Итог: 79 350</b></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FEB 13 -->
+  <div class="day-block">
+    <div class="day-header absent-day" onclick="toggleDay(this)"><span class="arrow">▼</span> 13.02 (чт) — ❌ Бахром отпущен на другие объекты</div>
+    <div class="day-content">
+      <div class="day-summary absent">DM отпускает маляра Бахрома. Ремонт не стартует.</div>
+      <div class="messages">
+        <div class="msg dm evidence"><span class="msg-time">14:04</span> Я Бахрома тоже отпускаю на другие объекты... Ну явно не срастается по квартире.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FEB 15 -->
+  <div class="day-block">
+    <div class="day-header work-day" onclick="toggleDay(this)"><span class="arrow">▼</span> 15.02 (сб) — ✅ Первый рабочий день! Демонтаж, аванс 45 000 ₽</div>
+    <div class="day-content">
+      <div class="day-summary work">Демонтаж дверных коробок. Подбор столешницы, фартука. Аванс 45 000 ₽.</div>
+      <div class="messages">
+        <div class="msg dm"><span class="msg-time">06:10</span> Возьми с собой ломик или монтировку. Боюсь, что без нее коробку не разберём..</div>
+        <div class="msg dm"><span class="msg-time">07:12</span> Шурик</div>
+        <div class="msg dm evidence"><span class="msg-time">13:30</span> Дима, давай так: аванс 45 000 руб. Далее как-нибудь разберемся... У меня распря с женой, что опять сделаю и денег не увижу... 😁</div>
+        <div class="msg me"><span class="msg-time">13:48</span> Ок</div>
+      </div>
+      <div class="photo-grid">
+        <img src="media/Дмитрий_Собиратель_Реликвария_Обэриу/photo_665791.jpg" onclick="openLightbox(this)" alt="Работы 15.02">
+        <img src="media/Дмитрий_Собиратель_Реликвария_Обэриу/photo_665792.jpg" onclick="openLightbox(this)" alt="Работы 15.02">
+      </div>
+    </div>
+  </div>
+
+  <!-- FEB 16 -->
+  <div class="day-block">
+    <div class="day-header work-day" onclick="toggleDay(this)"><span class="arrow">▼</span> 16.02 (вс) — ✅ Подготовка. Оплата 45 000 ₽</div>
+    <div class="day-content">
+      <div class="day-summary work">ME простудился. Оплата 45 000 ₽. Планирование демонтажа чулана.</div>
+      <div class="messages">
+        <div class="msg me"><span class="msg-time">07:10</span> Доброе, простудился немного но ок. Ща все будет</div>
+        <div class="msg dm"><span class="msg-time">19:04</span> Завтра после мамы, чулан ломаю? Не отхвачу скалкой по голове?</div>
+        <div class="msg me payment"><span class="msg-time">19:53</span> 45 закинул</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FEB 17 -->
+  <div class="day-block">
+    <div class="day-header work-day" onclick="toggleDay(this)"><span class="arrow">▼</span> 17.02 (пн) — ✅ Демонтаж чулана (DM опоздал — вода у сына)</div>
+    <div class="day-content">
+      <div class="day-summary work">DM опоздал ~40 мин — потекла вода в квартире сына. Демонтаж чулана.</div>
+      <div class="messages">
+        <div class="msg dm evidence"><span class="msg-time">04:18</span> У сына в квартире опять вода потекла, но уже с другого места... Сейчас пойду смотреть — скорее всего попозже приеду 😱</div>
+        <div class="msg dm"><span class="msg-time">07:42</span> Я через 40 минут буду.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FEB 19 -->
+  <div class="day-block">
+    <div class="day-header absent-day" onclick="toggleDay(this)"><span class="arrow">▼</span> 19.02 (ср) — ❌ DM: «свои дела», другие проекты</div>
+    <div class="day-content">
+      <div class="day-summary absent">DM не вышел — другие проекты. ME просит не затягивать.</div>
+      <div class="messages">
+        <div class="msg dm evidence"><span class="msg-time">08:18</span> Сегодня меня не будет. Надо своими делами позаниматься..</div>
+        <div class="msg me"><span class="msg-time">08:33</span> Дим прошу не затягивать потому что сдача квартиры напрямую зависит от её готовности как ты понимаешь</div>
+        <div class="msg dm evidence"><span class="msg-time">09:48</span> Ну я про то, что мне нужно денег зарабатывать и другие проекты заходят предупреждал. Сам неделю профукал же. Да и у мамы мелочёвка на два дня тоже не в тему...</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FEB 20 -->
+  <div class="day-block">
+    <div class="day-header absent-day" onclick="toggleDay(this)"><span class="arrow">▼</span> 20.02 (чт) — ❌ DM: совещание Газпром</div>
+    <div class="day-content">
+      <div class="day-summary absent">DM срочно вызван к заказчику. ME просит предупреждать.</div>
+      <div class="messages">
+        <div class="msg me"><span class="msg-time">08:32</span> Ку-ку. Тебя когда ждать?</div>
+        <div class="msg dm evidence"><span class="msg-time">12:10</span> Привет. Срочно вызвали к заказчику на совещание. Только освободился. Завтра буду.</div>
+        <div class="msg me"><span class="msg-time">12:13</span> Предупреждай плз</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FEB 21-23 -->
+  <div class="day-block">
+    <div class="day-header absent-day" onclick="toggleDay(this)"><span class="arrow">▼</span> 21–23.02 (пт–вс) — ❌ DM болен 3 дня (простуда, t° 37°)</div>
+    <div class="day-content">
+      <div class="day-summary absent">DM болеет 3 дня: горло, насморк, температура 37°. 23.02 вечером обещает выйти завтра.</div>
+      <div class="messages">
+        <div class="msg dm evidence"><span class="msg-time">21.02 07:40</span> Горло, насморк, голова. Я хреново себя чувствую... Похоже на простуду... 😢. Будем нагонять. Сегодня на лекарствах дома.</div>
+        <div class="msg me"><span class="msg-time">21.02 07:47</span> ну хоть шкаф повесили</div>
+        <div class="msg dm"><span class="msg-time">21.02 19:34</span> На данную минуту 37 ровно.</div>
+        <div class="msg dm"><span class="msg-time">23.02 07:07</span> Да вроде оклимался. Насморк сильный, но это стандартно с моим носом. Вчера вообще без сил валялся..</div>
+        <div class="msg dm"><span class="msg-time">23.02 17:51</span> На данный момент температуры нет. Слабость и насморк. Завтра выхожу.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FEB 24 -->
+  <div class="day-block">
+    <div class="day-header work-day" onclick="toggleDay(this)"><span class="arrow">▼</span> 24.02 (пн) — ✅ Демонтаж кухни</div>
+    <div class="day-content">
+      <div class="day-summary work">DM с 13:30. Демонтаж кухонных шкафов, столешницы. Заказ вывоза мусора.</div>
+      <div class="messages">
+        <div class="msg dm"><span class="msg-time">11:05</span> В 13:30</div>
+        <div class="msg me"><span class="msg-time">14:14</span> огонь!!!! что делаем с буковой Г?</div>
+        <div class="msg me"><span class="msg-time">14:20</span> о а теперь буква Т) Боже ну это просто прекрасно</div>
+        <div class="msg dm"><span class="msg-time">15:01</span> Складировать особо негде. Предлагаю снять столешку и заказывать вывоз</div>
+        <div class="msg dm"><span class="msg-time">15:02</span> Диван тоже в помойку.</div>
+        <div class="msg me"><span class="msg-time">17:48</span> заказал мусор на завтра начиная с 11</div>
+      </div>
+      <div class="photo-grid">
+        <img src="media/Дмитрий_Собиратель_Реликвария_Обэриу/photo_668386.jpg" onclick="openLightbox(this)" alt="Демонтаж кухни">
+        <img src="media/Дмитрий_Собиратель_Реликвария_Обэриу/photo_668387.jpg" onclick="openLightbox(this)" alt="Демонтаж кухни">
+        <img src="media/Дмитрий_Собиратель_Реликвария_Обэриу/photo_668398.jpg" onclick="openLightbox(this)" alt="Демонтаж кухни">
+        <img src="media/Дмитрий_Собиратель_Реликвария_Обэриу/photo_668421.jpg" onclick="openLightbox(this)" alt="Демонтаж кухни">
+        <img src="media/Дмитрий_Собиратель_Реликвария_Обэриу/photo_668422.jpg" onclick="openLightbox(this)" alt="Демонтаж кухни">
+        <img src="media/Дмитрий_Собиратель_Реликвария_Обэриу/photo_668423.jpg" onclick="openLightbox(this)" alt="Демонтаж кухни">
+        <img src="media/Дмитрий_Собиратель_Реликвария_Обэриу/photo_668425.jpg" onclick="openLightbox(this)" alt="Складирование">
+        <img src="media/Дмитрий_Собиратель_Реликвария_Обэриу/photo_668426.jpg" onclick="openLightbox(this)" alt="Диван на вывоз">
+        <img src="media/Дмитрий_Собиратель_Реликвария_Обэриу/photo_668446.jpg" onclick="openLightbox(this)" alt="Всё здесь">
+        <img src="media/Дмитрий_Собиратель_Реликвария_Обэриу/photo_668448.jpg" onclick="openLightbox(this)" alt="Диван">
+      </div>
+    </div>
+  </div>
+
+  <!-- FEB 25 -->
+  <div class="day-block">
+    <div class="day-header work-day" onclick="toggleDay(this)"><span class="arrow">▼</span> 25.02 (вт) — ✅ Демонтаж кухни, вывоз мусора</div>
+    <div class="day-content">
+      <div class="day-summary work">DM на объекте с утра. Вывоз мусора. Продолжение демонтажа.</div>
+      <div class="messages">
+        <div class="msg dm"><span class="msg-time">07:29</span> Уже тута</div>
+        <div class="msg me"><span class="msg-time">07:37</span> ага запну мусорщиков</div>
+        <div class="msg me"><span class="msg-time">07:38</span> у нас когда пыльные работы будут?</div>
+      </div>
+      <div class="photo-grid">
+        <img src="media/Дмитрий_Собиратель_Реликвария_Обэриу/photo_668689.jpg" onclick="openLightbox(this)" alt="На помойку">
+        <img src="media/Дмитрий_Собиратель_Реликвария_Обэриу/photo_668724.jpg" onclick="openLightbox(this)" alt="Кухня">
+      </div>
+    </div>
+  </div>
+
+  <!-- FEB 27 -->
+  <div class="day-block">
+    <div class="day-header work-day" onclick="toggleDay(this)"><span class="arrow">▼</span> 27.02 (чт) — ✅ Подготовительные работы</div>
+    <div class="day-content">
+      <div class="day-summary work">DM на объекте. Фото прогресса. Повторная смета малярки.</div>
+      <div class="photo-grid">
+        <img src="media/Дмитрий_Собиратель_Реликвария_Обэриу/photo_669591.jpg" onclick="openLightbox(this)" alt="Прогресс 27.02">
+        <img src="media/Дмитрий_Собиратель_Реликвария_Обэриу/photo_669592.jpg" onclick="openLightbox(this)" alt="Прогресс 27.02">
+        <img src="media/Дмитрий_Собиратель_Реликвария_Обэриу/photo_669593.jpg" onclick="openLightbox(this)" alt="Прогресс 27.02">
+        <img src="media/Дмитрий_Собиратель_Реликвария_Обэриу/photo_669594.jpg" onclick="openLightbox(this)" alt="Прогресс 27.02">
+      </div>
+    </div>
+  </div>
+
+  <!-- FEB 28 -->
+  <div class="day-block">
+    <div class="day-header work-day" onclick="toggleDay(this)"><span class="arrow">▼</span> 28.02 (пт) — ✅ Оплата 70 000 ₽. DM признаёт: к малярке не приступил</div>
+    <div class="day-content">
+      <div class="day-summary absent">DM признаёт: за 2 недели к объёмам Бахрома не приступил. ME переводит 70 000 ₽.</div>
+      <div class="messages">
+        <div class="msg dm"><span class="msg-time">11:01</span> Привет. Мне нужно понимать по денежке: ты поможешь сегодня или как?</div>
+        <div class="msg dm"><span class="msg-time">13:52</span> Аууу. Привет. Ответь плиззз. Или мне искать где-то ещё?</div>
+        <div class="msg me"><span class="msg-time">14:03</span> Но давай запланируем к концу недели готовую под сдачу квартиру</div>
+        <div class="msg dm evidence"><span class="msg-time">16:25</span> По времени прошло две недели, а я так к объемам Бахрома и не приступил. Если завтра получится затирка сделать, то будет чудесно. Её же ещё купить надо сперва+шпателя резиновые (ты говорил, что привезёшь, но их так и нету)+губка большая...</div>
+        <div class="msg dm"><span class="msg-time">17:12</span> Мне на какие средства покупать?</div>
+        <div class="msg me payment"><span class="msg-time">17:19</span> Перевел 70000</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAR 1 -->
+  <div class="day-block">
+    <div class="day-header work-day" onclick="toggleDay(this)"><span class="arrow">▼</span> 01.03 (сб) — ✅ Затирка ванной</div>
+    <div class="day-content">
+      <div class="day-summary work">DM на объекте. Затирка швов в ванной. ME приехал к 15:00.</div>
+      <div class="messages">
+        <div class="msg me"><span class="msg-time">10:41</span> Так теперь я немножко задержусь буду ближе к трём</div>
+      </div>
+      <div class="photo-grid">
+        <img src="media/Дмитрий_Собиратель_Реликвария_Обэриу/photo_670047.jpg" onclick="openLightbox(this)" alt="Затирка 01.03">
+        <img src="media/Дмитрий_Собиратель_Реликвария_Обэриу/photo_670048.jpg" onclick="openLightbox(this)" alt="Затирка 01.03">
+        <img src="media/Дмитрий_Собиратель_Реликвария_Обэриу/photo_670049.jpg" onclick="openLightbox(this)" alt="Затирка 01.03">
+      </div>
+    </div>
+  </div>
+
+  <!-- MAR 2 -->
+  <div class="day-block">
+    <div class="day-header work-day" onclick="toggleDay(this)"><span class="arrow">▼</span> 02.03 (вс) — ✅ Завершение затирки. План на неделю</div>
+    <div class="day-content">
+      <div class="day-summary work">ME составил план: Пн-затирка, Вт-штукатурка, Ср-шпаклёвка, Чт-покраска, Пт-портал+ковролин.</div>
+      <div class="messages">
+        <div class="msg me"><span class="msg-time">08:04</span> Понедельник: финал затирка и подготовка к штукатурке<br>Вторник: штукатурка<br>Среда: шкурка и шпатлевка<br>Четверг: шкурка и покраска<br>К пятнице: портал и ковролин</div>
+        <div class="msg me"><span class="msg-time">08:35</span> Электрик МДС — будет через час</div>
+        <div class="msg dm"><span class="msg-time">09:14</span> Не успею я. Ща передоговорюсь.</div>
+      </div>
+      <div class="photo-grid">
+        <img src="media/Дмитрий_Собиратель_Реликвария_Обэриу/photo_670512.jpg" onclick="openLightbox(this)" alt="Прогресс 02.03">
+      </div>
+    </div>
+  </div>
+
+  <!-- MAR 3 -->
+  <div class="day-block">
+    <div class="day-header absent-day" onclick="toggleDay(this)"><span class="arrow">▼</span> 03.03 (пн) — ❌ Инсульт отца DM. Госпитализация</div>
+    <div class="day-content">
+      <div class="day-summary absent">У отца DM инсульт. Госпитализация в Первый мед. DM извиняется за агрессию.</div>
+      <div class="messages">
+        <div class="msg dm evidence"><span class="msg-time">17:09</span> Ссори за агрессию. Буквально за пол часа до тебя моего отца с инсультом положили в первый мед</div>
+        <div class="msg me"><span class="msg-time">17:19</span> Нужна помощь? Есть связи в Алмазова</div>
+      </div>
+      <div class="photo-grid">
+        <img src="media/Дмитрий_Собиратель_Реликвария_Обэриу/photo_670630.jpg" onclick="openLightbox(this)" alt="03.03">
+      </div>
+    </div>
+  </div>
+
+  <!-- MAR 4-6 -->
+  <div class="day-block">
+    <div class="day-header absent-day" onclick="toggleDay(this)"><span class="arrow">▼</span> 04–06.03 (вт–чт) — ❌ DM в больнице у отца (3 дня)</div>
+    <div class="day-content">
+      <div class="day-summary absent">DM ездит в Первый мед. Работы полностью остановлены.</div>
+      <div class="messages">
+        <div class="msg dm evidence"><span class="msg-time">04.03 08:09</span> Еду в первый мед. Ночью через знакомых пробил что писает и дышит сам.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAR 7 -->
+  <div class="day-block">
+    <div class="day-header partial-day" onclick="toggleDay(this)"><span class="arrow">▼</span> 07.03 (пт) — ⚠️ DM на другом объекте. Планирование</div>
+    <div class="day-content">
+      <div class="day-summary">DM работает на другом объекте. Планирует: послезавтра штукатурка, затем шпаклёвка. Просит закупить электрику.</div>
+      <div class="messages">
+        <div class="msg dm"><span class="msg-time">16:38</span> Послезавтра штукатурю всё. Ты сможешь подъехать послезавтра отодвинуть всё на середину... Послезавтра везде штукатурка, после послезавтра шпаклёвка везде. А также в идеале было бы завтра закупить электрику...</div>
+        <div class="msg dm"><span class="msg-time">20:38</span> Я завтра в обед у отца в больнице. Набирай с утра лучше.</div>
+      </div>
+      <div class="photo-grid">
+        <img src="media/Дмитрий_Собиратель_Реликвария_Обэриу/photo_672204.jpg" onclick="openLightbox(this)" alt="07.03">
+        <img src="media/Дмитрий_Собиратель_Реликвария_Обэриу/photo_672205.jpg" onclick="openLightbox(this)" alt="07.03">
+      </div>
+    </div>
+  </div>
+
+  <!-- MAR 8-9 -->
+  <div class="day-block">
+    <div class="day-header absent-day" onclick="toggleDay(this)"><span class="arrow">▼</span> 08–09.03 (сб–вс) — ❌ DM у отца / простой</div>
+    <div class="day-content">
+      <div class="day-summary absent">08.03 — DM у отца в больнице. 09.03 — нет контакта.</div>
+      <div class="messages">
+        <div class="msg me"><span class="msg-time">08.03 07:00</span> так а шо закупать то?</div>
+        <div class="msg me"><span class="msg-time">08.03 14:22</span> а?</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAR 10 -->
+  <div class="day-block">
+    <div class="day-header absent-day" onclick="toggleDay(this)"><span class="arrow">▼</span> 10.03 (пн) — ❌ DM: Газпром</div>
+    <div class="day-content">
+      <div class="day-summary absent">DM занят заказом Газпрома.</div>
+      <div class="messages">
+        <div class="msg dm evidence"><span class="msg-time">08:41</span> Я буду сегодня позже</div>
+        <div class="msg me"><span class="msg-time">08:41</span> Живой?</div>
+        <div class="msg dm"><span class="msg-time">09:28</span> Газпром</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAR 11 -->
+  <div class="day-block">
+    <div class="day-header partial-day" onclick="toggleDay(this)"><span class="arrow">▼</span> 11.03 (вт) — ⚠️ Подбор электрики, закупка бура. Работа?</div>
+    <div class="day-content">
+      <div class="day-summary">DM присылает ссылки на розетки/выключатели. ME купил бур. Неясно, был ли DM на объекте.</div>
+      <div class="messages">
+        <div class="msg me"><span class="msg-time">11:55</span> Мужчина розетка это прекрасный ты собирался перезвонить через 20 минут и где-то собственно что у нас с работой?</div>
+        <div class="msg me"><span class="msg-time">16:27</span> Купил бур</div>
+      </div>
+      <div class="photo-grid">
+        <img src="media/Дмитрий_Собиратель_Реликвария_Обэриу/photo_673502.jpg" onclick="openLightbox(this)" alt="Розетки">
+      </div>
+    </div>
+  </div>
+
+  <!-- MAR 12 -->
+  <div class="day-block">
+    <div class="day-header work-day" onclick="toggleDay(this)"><span class="arrow">▼</span> 12.03 (ср) — ✅ Мелочёвка + шкурка шпаклёвки</div>
+    <div class="day-content">
+      <div class="day-summary work">DM на объекте. Днём мелкие работы, вечером — шкурка шпаклёвки.</div>
+      <div class="messages">
+        <div class="msg dm"><span class="msg-time">07:44</span> Я мчусь</div>
+        <div class="msg dm"><span class="msg-time">07:59</span> Поздно вечером я шкурю шпаклёвку. Сейчас займусь мелочёвка всякими.</div>
+        <div class="msg me"><span class="msg-time">08:30</span> Это какими?</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAR 13-18 -->
+  <div class="day-block">
+    <div class="day-header absent-day" onclick="toggleDay(this)"><span class="arrow">▼</span> 13–18.03 (чт–вт) — ❌ 6 дней без контакта по ремонту</div>
+    <div class="day-content">
+      <div class="day-summary absent">Нет сообщений о работе 6 дней подряд. 14.03 — только пересылка новости про кабана.</div>
+      <div class="messages">
+        <div class="msg dm"><span class="msg-time">14.03 20:38</span> [Пересылка: нападение кабана у заказника — не связано с ремонтом]</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAR 19 -->
+  <div class="day-block">
+    <div class="day-header absent-day" onclick="toggleDay(this)"><span class="arrow">▼</span> 19.03 (ср) — ⚠️ ME: итог за 1.5 месяца. Ничего не готово</div>
+    <div class="day-content">
+      <div class="day-summary absent">ME был на квартире — стены не прошкурены, электричество не сделано. Вложено ~200 000 ₽, недополучена квартплата за 2 мес.</div>
+      <div class="messages">
+        <div class="msg me"><span class="msg-time">05:59</span> Дмитрий, с прошедшим ДР</div>
+        <div class="msg me evidence"><span class="msg-time">06:01</span> Давай созвонимся и проговорим что сделано. что и когда будет сделано. ремонтируем уже полтора месяца. Вложено около 200 тыс. Недополучена квартплата за 2 мес.</div>
+        <div class="msg me evidence"><span class="msg-time">06:01</span> вчера был там. не вижу что можно красить так как не все прошкурено</div>
+        <div class="msg me evidence"><span class="msg-time">06:01</span> Электричество не делал, хотя все закупили 10 дней назад</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Lightbox -->
+<div class="lightbox" id="lightbox" onclick="closeLightbox()">
+  <img id="lightbox-img" src="" alt="Увеличенное фото">
+</div>
+
+<script>
+function toggleDay(header) {
+  const content = header.nextElementSibling;
+  content.classList.toggle('hidden');
+  header.classList.toggle('collapsed');
+}
+
+function openLightbox(img) {
+  document.getElementById('lightbox-img').src = img.src;
+  document.getElementById('lightbox').classList.add('active');
+}
+
+function closeLightbox() {
+  document.getElementById('lightbox').classList.remove('active');
+}
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closeLightbox();
+});
+</script>
+
+</body>
+</html>

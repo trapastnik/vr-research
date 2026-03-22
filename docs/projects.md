@@ -11,6 +11,7 @@
 |--------|--------|----------|
 | **VR-экосистема** | [vr.ostrov-vezeniya.ru](https://vr.ostrov-vezeniya.ru/) | Исследование VR для культурного наследия СПб. 13 глав, 170+ источников |
 | **Telegram-мониторинг** | [Мониторинг](https://vr.ostrov-vezeniya.ru/monitoring/) | Годовой анализ 8 Telegram-каналов VR/AR-индустрии |
+| **Отчёт по ремонту** | [Отчёт](https://vr.ostrov-vezeniya.ru/remont-report/) | Хронология ремонта: календарь, сообщения, фото, финансы |
 
 ---
 
